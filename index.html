@@ -365,7 +365,7 @@
     <!-- Application & Firebase Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, doc, setDoc, getDoc, addDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Global Variables
@@ -402,7 +402,18 @@
                 const auth = getAuth(app);
                 db = getFirestore(app);
 
+                // Canvas Sandbox Compatibility (Ignores this on GitHub)
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                }
+
                 onAuthStateChanged(auth, async (user) => {
+                    // ENFORCE GOOGLE ONLY: Log out any lingering anonymous sessions from earlier tests
+                    if (user && user.isAnonymous) {
+                        await signOut(auth);
+                        return;
+                    }
+
                     currentUser = user;
                     const statusBadge = document.getElementById('auth-status');
                     const btnLogin = document.getElementById('btn-login');
