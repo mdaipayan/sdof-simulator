@@ -763,37 +763,37 @@
                 extraVarsHtml = `<p class="math-block mb-3 text-slate-700"><strong>Roots:</strong> \\( s_1 = \\mathbf{${window.fmt(s1)}} \\), \\( s_2 = \\mathbf{${window.fmt(s2)}} \\)</p>`;
             }
 
-            // Construct Universal General Equations
+            // Construct Universal General Equations (Symbolic Form)
             let genDispStr = "";
             let genVelStr = "";
             
             if (!window.isForced) {
                 if (zeta === 0) {
-                    genDispStr = `A \\cos(${window.fmt(wn)}t) + B \\sin(${window.fmt(wn)}t)`;
-                    genVelStr = `-${window.fmt(wn)}A \\sin(${window.fmt(wn)}t) + ${window.fmt(wn)}B \\cos(${window.fmt(wn)}t)`;
+                    genDispStr = `A \\cos(\\omega_n t) + B \\sin(\\omega_n t)`;
+                    genVelStr = `-A \\omega_n \\sin(\\omega_n t) + B \\omega_n \\cos(\\omega_n t)`;
                 } else if (zeta < 1) {
-                    genDispStr = `e^{-${window.fmt(decay)}t} \\left( A \\cos(${window.fmt(wd)}t) + B \\sin(${window.fmt(wd)}t) \\right)`;
-                    genVelStr = `e^{-${window.fmt(decay)}t} \\left[ (-${window.fmt(decay)}A + ${window.fmt(wd)}B)\\cos(${window.fmt(wd)}t) - (${window.fmt(decay)}B + ${window.fmt(wd)}A)\\sin(${window.fmt(wd)}t) \\right]`;
+                    genDispStr = `e^{-\\zeta\\omega_n t} \\left( A \\cos(\\omega_d t) + B \\sin(\\omega_d t) \\right)`;
+                    genVelStr = `e^{-\\zeta\\omega_n t} \\left[ (-A\\zeta\\omega_n + B\\omega_d)\\cos(\\omega_d t) - (B\\zeta\\omega_n + A\\omega_d)\\sin(\\omega_d t) \\right]`;
                 } else if (Math.abs(zeta - 1) < 0.001) {
-                    genDispStr = `(A + Bt) e^{-${window.fmt(wn)}t}`;
-                    genVelStr = `[B - ${window.fmt(wn)}(A + Bt)] e^{-${window.fmt(wn)}t}`;
+                    genDispStr = `(A + Bt) e^{-\\omega_n t}`;
+                    genVelStr = `[B - \\omega_n(A + Bt)] e^{-\\omega_n t}`;
                 } else {
-                    genDispStr = `A e^{${window.fmt(s1)}t} + B e^{${window.fmt(s2)}t}`;
-                    genVelStr = `${window.fmt(s1)}A e^{${window.fmt(s1)}t} + ${window.fmt(s2)}B e^{${window.fmt(s2)}t}`;
+                    genDispStr = `A e^{s_1 t} + B e^{s_2 t}`;
+                    genVelStr = `A s_1 e^{s_1 t} + B s_2 e^{s_2 t}`;
                 }
             } else {
                 if (zeta === 0) {
-                    genDispStr = `A\\cos(${window.fmt(wn)}t) + B\\sin(${window.fmt(wn)}t) + X\\sin(${window.fmt(w)}t - \\phi)`;
-                    genVelStr = `-${window.fmt(wn)}A\\sin(${window.fmt(wn)}t) + ${window.fmt(wn)}B\\cos(${window.fmt(wn)}t) + ${window.fmt(w)}X\\cos(${window.fmt(w)}t - \\phi)`;
+                    genDispStr = `A\\cos(\\omega_n t) + B\\sin(\\omega_n t) + X\\sin(\\omega t - \\phi)`;
+                    genVelStr = `-A\\omega_n\\sin(\\omega_n t) + B\\omega_n\\cos(\\omega_n t) + X\\omega\\cos(\\omega t - \\phi)`;
                 } else if (zeta < 1) {
-                    genDispStr = `e^{-${window.fmt(decay)}t}(A\\cos(${window.fmt(wd)}t) + B\\sin(${window.fmt(wd)}t)) + X\\sin(${window.fmt(w)}t - \\phi)`;
-                    genVelStr = `e^{-${window.fmt(decay)}t}[(-${window.fmt(decay)}A + ${window.fmt(wd)}B)\\cos(${window.fmt(wd)}t) - (${window.fmt(decay)}B + ${window.fmt(wd)}A)\\sin(${window.fmt(wd)}t)] + ${window.fmt(w)}X\\cos(${window.fmt(w)}t - \\phi)`;
+                    genDispStr = `e^{-\\zeta\\omega_n t}\\left( A\\cos(\\omega_d t) + B\\sin(\\omega_d t) \\right) + X\\sin(\\omega t - \\phi)`;
+                    genVelStr = `e^{-\\zeta\\omega_n t}\\left[ (-A\\zeta\\omega_n + B\\omega_d)\\cos(\\omega_d t) - (B\\zeta\\omega_n + A\\omega_d)\\sin(\\omega_d t) \\right] + X\\omega\\cos(\\omega t - \\phi)`;
                 } else if (Math.abs(zeta - 1) < 0.001) {
-                    genDispStr = `(A + Bt)e^{-${window.fmt(wn)}t} + X\\sin(${window.fmt(w)}t - \\phi)`;
-                    genVelStr = `[B - ${window.fmt(wn)}(A + Bt)]e^{-${window.fmt(wn)}t} + ${window.fmt(w)}X\\cos(${window.fmt(w)}t - \\phi)`;
+                    genDispStr = `(A + Bt)e^{-\\omega_n t} + X\\sin(\\omega t - \\phi)`;
+                    genVelStr = `[B - \\omega_n(A + Bt)]e^{-\\omega_n t} + X\\omega\\cos(\\omega t - \\phi)`;
                 } else {
-                    genDispStr = `Ae^{${window.fmt(s1)}t} + Be^{${window.fmt(s2)}t} + X\\sin(${window.fmt(w)}t - \\phi)`;
-                    genVelStr = `${window.fmt(s1)}Ae^{${window.fmt(s1)}t} + ${window.fmt(s2)}Be^{${window.fmt(s2)}t} + ${window.fmt(w)}X\\cos(${window.fmt(w)}t - \\phi)`;
+                    genDispStr = `Ae^{s_1 t} + Be^{s_2 t} + X\\sin(\\omega t - \\phi)`;
+                    genVelStr = `As_1 e^{s_1 t} + Bs_2 e^{s_2 t} + X\\omega\\cos(\\omega t - \\phi)`;
                 }
             }
 
@@ -987,6 +987,7 @@
                 
                 rawPhi = Math.atan2(denom2, denom1);
                 if(rawPhi < 0) rawPhi += Math.PI; 
+                const phiDeg = rawPhi * 180 / Math.PI;
                 
                 html += `<div class="mb-8">
                     <h3 class="text-xl font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4">3. Steady State Properties</h3>
@@ -994,7 +995,7 @@
                         <div class="bg-white p-3 rounded shadow-sm border border-slate-100 text-center"><p class="text-xs text-slate-500 font-bold mb-1">Freq Ratio (r)</p><p class="font-mono">${window.fmt(r)}</p></div>
                         <div class="bg-white p-3 rounded shadow-sm border border-slate-100 text-center"><p class="text-xs text-slate-500 font-bold mb-1">Static Disp (X₀)</p><p class="font-mono">${window.fmt(X0)} m</p></div>
                         <div class="bg-indigo-50 p-3 rounded shadow-sm border border-indigo-100 text-center"><p class="text-xs text-indigo-700 font-bold mb-1">Amplitude (X)</p><p class="font-mono font-bold">${window.fmt(X)} m</p></div>
-                        <div class="bg-indigo-50 p-3 rounded shadow-sm border border-indigo-100 text-center"><p class="text-xs text-indigo-700 font-bold mb-1">Phase (φ)</p><p class="font-mono font-bold">${window.fmt(rawPhi)} rad</p></div>
+                        <div class="bg-indigo-50 p-3 rounded shadow-sm border border-indigo-100 text-center"><p class="text-xs text-indigo-700 font-bold mb-1">Phase (φ)</p><p class="font-mono font-bold">${window.fmt(rawPhi)} rad <span class="block text-[10px] text-indigo-500 font-normal mt-0.5">(${window.fmt(phiDeg)}&deg;)</span></p></div>
                     </div>`;
 
                 if(r > 1) html += `<div class="bg-red-50 text-red-700 p-3 rounded border border-red-200 text-sm mb-4"><strong>Phase Trap Triggered:</strong> \\( r > 1 \\), added \\( 180^\\circ \\) to phase angle!<br><span class="text-xs"><em>(Conversion: \\( \\text{Radians} = \\text{Degrees} \\times \\frac{\\pi}{180} \\))</em></span></div>`;
@@ -1080,8 +1081,8 @@
                             The <strong>Transient Solution</strong> acts like a temporary bridge. It must perfectly cover the "gap" between where the mass actually starts and where the steady-state wave expects it to be!
                         </div>
                         <p class="text-slate-600 italic">1. Find where the steady-state equation physically is at t=0:</p>
-                        <p class="math-block">\\( x_{ss}(0) = X\\sin(-\\phi) = ${window.fmt(X)}\\sin(-${window.fmt(rawPhi)}) = \\mathbf{${window.fmt(x_steady_0)}} \\)</p>
-                        <p class="math-block">\\( v_{ss}(0) = \\omega X\\cos(-\\phi) = ${window.fmt(w)}(${window.fmt(X)})\\cos(-${window.fmt(rawPhi)}) = \\mathbf{${window.fmt(v_steady_0)}} \\)</p>
+                        <p class="math-block">\\( x_{ss}(0) = X\\sin(-\\phi) = -X\\sin(\\phi) = -${window.fmt(X)}\\sin(${window.fmt(phiDeg)}^\\circ) = \\mathbf{${window.fmt(x_steady_0)}} \\)</p>
+                        <p class="math-block">\\( v_{ss}(0) = \\omega X\\cos(-\\phi) = \\omega X\\cos(\\phi) = ${window.fmt(w)}(${window.fmt(X)})\\cos(${window.fmt(phiDeg)}^\\circ) = \\mathbf{${window.fmt(v_steady_0)}} \\)</p>
                         <p class="text-slate-600 italic mt-4">2. Calculate the "Gap" the transient solution must correct for:</p>
                         <p class="math-block">\\( x_{trans}(0) = x_0 - x_{ss}(0) = ${window.fmt(x0)} - (${window.fmt(x_steady_0)}) = \\mathbf{${window.fmt(C0)}} \\)</p>
                         <p class="math-block">\\( v_{trans}(0) = v_0 - v_{ss}(0) = ${window.fmt(v0)} - (${window.fmt(v_steady_0)}) = \\mathbf{${window.fmt(C1)}} \\)</p>
