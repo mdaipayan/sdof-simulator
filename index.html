@@ -36,18 +36,22 @@
     <div class="max-w-[90rem] mx-auto space-y-6">
         
         <!-- Header -->
-        <header class="text-center space-y-3">
+        <header class="text-center space-y-3 relative">
+            <div id="auth-status" class="absolute top-0 right-0 bg-slate-200 text-slate-600 text-xs px-3 py-1.5 rounded-full font-semibold shadow-sm flex items-center">
+                <span class="w-2 h-2 rounded-full bg-amber-400 mr-2 animate-pulse"></span> Connecting to Cloud...
+            </div>
+            
             <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">Interactive SDOF Learning Engine</h1>
             <p class="text-lg text-slate-600">Solve complete equations in real-time or study the universal algorithm.</p>
             
             <div class="flex flex-wrap justify-center gap-4 pt-4" id="header-buttons">
-                <button onclick="loadExample('decay')" class="bg-indigo-100 text-indigo-700 hover:bg-indigo-200 px-4 py-2 rounded-full text-sm font-bold transition-colors border border-indigo-300 shadow-sm">
+                <button onclick="window.loadExample('decay')" class="bg-indigo-100 text-indigo-700 hover:bg-indigo-200 px-4 py-2 rounded-full text-sm font-bold transition-colors border border-indigo-300 shadow-sm">
                     Textbook: Underdamped Decay
                 </button>
-                <button onclick="loadExample('beating')" class="bg-emerald-100 text-emerald-700 hover:bg-emerald-200 px-4 py-2 rounded-full text-sm font-bold transition-colors border border-emerald-300 shadow-sm">
+                <button onclick="window.loadExample('beating')" class="bg-emerald-100 text-emerald-700 hover:bg-emerald-200 px-4 py-2 rounded-full text-sm font-bold transition-colors border border-emerald-300 shadow-sm">
                     Textbook: Beating Phenomenon
                 </button>
-                <button onclick="clearAll()" class="bg-slate-200 text-slate-700 hover:bg-slate-300 px-4 py-2 rounded-full text-sm font-bold transition-colors border border-slate-300 shadow-sm">
+                <button onclick="window.clearAll()" class="bg-slate-200 text-slate-700 hover:bg-slate-300 px-4 py-2 rounded-full text-sm font-bold transition-colors border border-slate-300 shadow-sm">
                     Clear Data
                 </button>
             </div>
@@ -55,11 +59,14 @@
 
         <!-- Tab Navigation -->
         <div class="flex flex-wrap justify-center border-b-2 border-slate-200 mt-8 mb-6">
-            <button id="tab-btn-solver" onclick="switchTab('solver')" class="px-6 md:px-8 py-3 text-sm md:text-lg font-bold text-blue-700 border-b-4 border-blue-700 hover:bg-slate-200 transition-colors focus:outline-none -mb-[2px]">
+            <button id="tab-btn-solver" onclick="window.switchTab('solver')" class="px-4 md:px-8 py-3 text-sm md:text-lg font-bold text-blue-700 border-b-4 border-blue-700 hover:bg-slate-200 transition-colors focus:outline-none -mb-[2px]">
                 🧮 SDOF Solver
             </button>
-            <button id="tab-btn-formulas" onclick="switchTab('formulas')" class="px-6 md:px-8 py-3 text-sm md:text-lg font-bold text-slate-500 border-b-4 border-transparent hover:bg-slate-200 transition-colors focus:outline-none -mb-[2px]">
+            <button id="tab-btn-formulas" onclick="window.switchTab('formulas')" class="px-4 md:px-8 py-3 text-sm md:text-lg font-bold text-slate-500 border-b-4 border-transparent hover:bg-slate-200 transition-colors focus:outline-none -mb-[2px]">
                 📝 Equations & Protocol
+            </button>
+            <button id="tab-btn-history" onclick="window.switchTab('history')" class="px-4 md:px-8 py-3 text-sm md:text-lg font-bold text-slate-500 border-b-4 border-transparent hover:bg-slate-200 transition-colors focus:outline-none -mb-[2px]">
+                ☁️ Cloud History
             </button>
         </div>
 
@@ -78,23 +85,23 @@
                     <div class="space-y-4">
                         <div>
                             <label class="block text-sm font-semibold text-slate-700 mb-1">Mass (M) <span class="text-slate-400 font-normal">[kg]</span></label>
-                            <input type="number" id="inp-m" class="input-field" placeholder="e.g. 10" oninput="updateCalculations()">
+                            <input type="number" id="inp-m" class="input-field" placeholder="e.g. 10" oninput="window.updateCalculations()">
                         </div>
                         
                         <div>
                             <div class="flex justify-between items-end mb-1">
                                 <label class="block text-sm font-semibold text-slate-700">Stiffness (K) <span class="text-slate-400 font-normal">[N/m]</span></label>
-                                <button onclick="toggleKMode()" class="text-xs text-blue-600 hover:underline">Calc from Static Deflection?</button>
+                                <button onclick="window.toggleKMode()" class="text-xs text-blue-600 hover:underline">Calc from Static Deflection?</button>
                             </div>
                             
                             <div id="k-direct-mode">
-                                <input type="number" id="inp-k" class="input-field" placeholder="e.g. 2000" oninput="updateCalculations()">
+                                <input type="number" id="inp-k" class="input-field" placeholder="e.g. 2000" oninput="window.updateCalculations()">
                             </div>
                             
                             <div id="k-calc-mode" class="hidden bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-2 mt-2">
                                 <div>
                                     <label class="block text-xs font-semibold text-slate-700 mb-1">Static Deflection (&delta;<sub>st</sub>) [m]</label>
-                                    <input type="number" id="inp-dst" class="input-field text-sm" placeholder="e.g. 0.05" oninput="calculateKFromDst()">
+                                    <input type="number" id="inp-dst" class="input-field text-sm" placeholder="e.g. 0.05" oninput="window.calculateKFromDst()">
                                 </div>
                                 <div class="text-xs text-slate-500 italic">K = (M &times; 10) / &delta;<sub>st</sub></div>
                             </div>
@@ -110,7 +117,7 @@
                     </h2>
                     <div>
                         <label class="block text-sm font-semibold text-slate-700 mb-1">Damping Coefficient (C) <span class="text-slate-400 font-normal">[Ns/m]</span></label>
-                        <input type="number" id="inp-c" class="input-field" placeholder="0 for Undamped" oninput="updateCalculations()">
+                        <input type="number" id="inp-c" class="input-field" placeholder="0 for Undamped" oninput="window.updateCalculations()">
                     </div>
                 </div>
 
@@ -122,18 +129,18 @@
                     </h2>
                     
                     <div class="flex space-x-2 mb-4 bg-slate-100 p-1 rounded-lg">
-                        <button id="btn-free" onclick="setForceMode('free')" class="flex-1 py-1.5 text-sm font-bold rounded-md bg-white shadow-sm text-slate-800">Free</button>
-                        <button id="btn-forced" onclick="setForceMode('forced')" class="flex-1 py-1.5 text-sm font-bold rounded-md text-slate-500 hover:text-slate-800">Forced</button>
+                        <button id="btn-free" onclick="window.setForceMode('free')" class="flex-1 py-1.5 text-sm font-bold rounded-md bg-white shadow-sm text-slate-800">Free</button>
+                        <button id="btn-forced" onclick="window.setForceMode('forced')" class="flex-1 py-1.5 text-sm font-bold rounded-md text-slate-500 hover:text-slate-800">Forced</button>
                     </div>
 
                     <div id="forced-inputs" class="hidden space-y-4">
                         <div>
                             <label class="block text-sm font-semibold text-slate-700 mb-1">Force Amplitude (F<sub>0</sub>) <span class="text-slate-400 font-normal">[N]</span></label>
-                            <input type="number" id="inp-f0" class="input-field" placeholder="e.g. 200" oninput="updateCalculations()">
+                            <input type="number" id="inp-f0" class="input-field" placeholder="e.g. 200" oninput="window.updateCalculations()">
                         </div>
                         <div>
                             <label class="block text-sm font-semibold text-slate-700 mb-1">Driving Freq. (&omega;) <span class="text-slate-400 font-normal">[rad/s]</span></label>
-                            <input type="number" id="inp-w" class="input-field" placeholder="e.g. 31.416" oninput="updateCalculations()">
+                            <input type="number" id="inp-w" class="input-field" placeholder="e.g. 31.416" oninput="window.updateCalculations()">
                         </div>
                     </div>
                     <div id="free-inputs" class="text-sm text-slate-600 italic text-center py-2">
@@ -150,11 +157,11 @@
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-semibold text-slate-700 mb-1">Disp. (x<sub>0</sub>) <span class="text-slate-400 font-normal">[m]</span></label>
-                            <input type="number" id="inp-x0" class="input-field" placeholder="0" oninput="updateCalculations()">
+                            <input type="number" id="inp-x0" class="input-field" placeholder="0" oninput="window.updateCalculations()">
                         </div>
                         <div>
                             <label class="block text-sm font-semibold text-slate-700 mb-1">Vel. (v<sub>0</sub>) <span class="text-slate-400 font-normal">[m/s]</span></label>
-                            <input type="number" id="inp-v0" class="input-field" placeholder="0" oninput="updateCalculations()">
+                            <input type="number" id="inp-v0" class="input-field" placeholder="0" oninput="window.updateCalculations()">
                         </div>
                     </div>
                 </div>
@@ -162,7 +169,12 @@
             </div>
 
             <!-- RIGHT COLUMN: Live Output -->
-            <div class="bg-white rounded-xl shadow-lg border border-slate-200 p-6 md:p-8 flex flex-col h-full">
+            <div class="bg-white rounded-xl shadow-lg border border-slate-200 p-6 md:p-8 flex flex-col h-full relative">
+                <div id="save-toast" class="absolute top-4 right-4 bg-emerald-600 text-white px-4 py-2 rounded-lg shadow-lg transform transition-all duration-300 opacity-0 translate-y-[-20px] pointer-events-none flex items-center z-50">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    Saved to Cloud!
+                </div>
+
                 <h2 class="text-2xl font-bold text-slate-800 mb-6 border-b pb-4 flex items-center justify-between">
                     <span>Live Solution Generator</span>
                     <span id="status-badge" class="text-sm px-3 py-1 bg-slate-100 text-slate-500 rounded-full font-medium">Awaiting Data...</span>
@@ -192,6 +204,9 @@
                         <p class="text-sm text-blue-800 mb-2 font-medium bg-blue-100 p-2 rounded">
                             <strong>Eq. of Motion:</strong> \(M\ddot{x} + C\dot{x} + Kx = F(t)\)
                         </p>
+                        <div class="text-xs text-blue-700 bg-white p-2 rounded mb-3 border border-blue-200">
+                            <strong>💡 Beginner Intuition:</strong> This equation just means: <em>(Inertia) + (Friction) + (Spring Force) = (Outside Push)</em>. It is just Newton's Second Law (\(F=ma\)) expanded!
+                        </div>
                         <ol class="list-decimal list-inside space-y-2 text-slate-800">
                             <li><strong>Find \(M\) and \(K\).</strong> If \(K\) is missing, calculate it via static deflection (\(K = Mg/\delta_{st}\)) or beam formula (\(3EI/L^3\)).</li>
                             <li><strong>Calculate the Holy Trinity:</strong>
@@ -220,162 +235,360 @@
                             <li>Check \(\zeta\) to pick your base equation:
                                 <ul class="list-disc list-inside ml-6 mt-1 space-y-4 text-slate-700 mt-2">
                                     <li>\(\zeta = 0 \implies\) <strong>Undamped</strong><br>
-                                        <span class="text-sm text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded font-mono font-semibold">\(x(t) = A\cos(\omega_n t) + B\sin(\omega_n t)\)</span><br>
-                                        <span class="text-xs text-slate-600 mt-1 block"><strong>Derivative:</strong> \(v(t) = -A\omega_n\sin(\omega_n t) + B\omega_n\cos(\omega_n t)\) <br>&rarr; <span class="font-bold text-emerald-700">\(B = v_0 / \omega_n\)</span></span>
+                                        <span class="text-sm text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded font-mono font-semibold">\(x(t) = A\cos(\omega_n t) + B\sin(\omega_n t)\)</span>
                                     </li>
                                     <li>\(0 < \zeta < 1 \implies\) <strong>Underdamped</strong> (\(\omega_d = \omega_n\sqrt{1-\zeta^2}\))<br>
-                                        <span class="text-sm text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded font-mono font-semibold">\(x(t) = e^{-\zeta\omega_n t}(A\cos\omega_d t + B\sin\omega_d t)\)</span><br>
-                                        <span class="text-xs text-slate-600 mt-1 block"><strong>Derivative:</strong> \(v(t) = e^{-\zeta\omega_n t}[(-\zeta\omega_n A + \omega_d B)\cos\omega_d t - (\zeta\omega_n B + \omega_d A)\sin\omega_d t]\) <br>&rarr; <span class="font-bold text-emerald-700">\(B = (v_0 + \zeta\omega_n A) / \omega_d\)</span></span>
+                                        <span class="text-sm text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded font-mono font-semibold">\(x(t) = e^{-\zeta\omega_n t}(A\cos\omega_d t + B\sin\omega_d t)\)</span>
+                                    </li>
+                                    <li>\(\zeta = 1 \implies\) <strong>Critically Damped</strong><br>
+                                        <span class="text-sm text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded font-mono font-semibold">\(x(t) = (A + Bt)e^{-\omega_n t}\)</span>
+                                    </li>
+                                </ul>
+                            </li>
+                            <div class="text-xs text-emerald-800 bg-white p-2 rounded my-3 border border-emerald-200">
+                                <strong>💡 Beginner Intuition (Constants A & B):</strong><br> 
+                                The equations above are "generic". To make them fit our specific problem, we must apply our starting rules.<br>
+                                1. Set \(t=0\) in the displacement equation to find \(A\).<br>
+                                2. Take the <strong>derivative</strong> to get the velocity equation, then set \(t=0\) to find \(B\).
+                            </div>
+                            <li class="pt-2"><strong>Step 1:</strong> Plug \(t=0\) and \(x(0) = x_0\) into the displacement equation to find constant \(A\) (\(A = x_0\)).</li>
+                            <li><strong>Step 2:</strong> Plug \(t=0\) and \(v(0) = v_0\) into the derivative equation to find constant \(B\).</li>
+                        </ol>
+                    </div>
+
+                    <!-- Phase 2B -->
+                    <div class="bg-purple-50 border-l-4 border-purple-600 p-5 rounded-r-lg shadow-sm">
+                        <h3 class="text-lg font-extrabold text-purple-900 mb-3 uppercase tracking-wide">PHASE 2B: Complete Forced Solutions</h3>
+                        <ol class="list-decimal list-inside space-y-2 text-slate-800">
+                            <li>Calculate Freq Ratio: \(r = \omega / \omega_n\).</li>
+                            <li>Calculate Steady Amplitude (\(X\)) and Phase Angle (\(\phi\)):
+                                <ul class="list-none ml-6 mt-2 space-y-2 text-slate-700 mb-2">
+                                    <li><span class="text-sm text-purple-800 bg-purple-100 px-2 py-0.5 rounded font-mono font-semibold">\(X = \frac{F_0 / K}{\sqrt{(1 - r^2)^2 + (2\zeta r)^2}}\)</span></li>
+                                    <li><span class="text-sm text-purple-800 bg-purple-100 px-2 py-0.5 rounded font-mono font-semibold">\(\phi = \tan^{-1}\left( \frac{2\zeta r}{1 - r^2} \right)\)</span></li>
+                                </ul>
+                            </li>
+                            <li class="text-red-700 font-bold bg-red-100 p-2 rounded text-sm mt-2">
+                                ⚠️ TRAP: If \(r > 1\), add \(180^\circ\) to your calculator's \(\phi\)!
+                            </li>
+                            <li class="mt-2"><strong>Steady State Only:</strong><br><span class="text-sm text-purple-800 bg-purple-100 px-2 py-0.5 rounded font-mono font-semibold">\(x_p(t) = X\sin(\omega t - \phi)\)</span></li>
+                            
+                            <div class="text-xs text-purple-800 bg-white p-2 rounded my-3 border border-purple-200">
+                                <strong>💡 Beginner Intuition (The "Gap"):</strong><br> 
+                                The Steady-State wave (\(x_p\)) has a life of its own. At time \(t=0\), it is NOT at your starting position \(x_0\). <br>
+                                The "Transient" equation (\(x_c\)) acts as a temporary mathematical bridge to connect your actual starting point to the steady-state wave.
+                            </div>
+
+                            <li class="mt-2"><strong>Complete Solution (Transient + Steady State):</strong>
+                                <ul class="list-disc list-inside ml-6 mt-1 space-y-3 text-slate-700 pt-1">
+                                    <li><em>Undamped + Forced:</em><br><span class="text-sm text-purple-800 bg-purple-100 px-2 py-0.5 rounded font-mono font-semibold">\(x(t) = [A\cos(\omega_n t) + B\sin(\omega_n t)] + X\sin(\omega t - \phi)\)</span></li>
+                                    <li><em>Underdamped + Forced:</em><br><span class="text-sm text-purple-800 bg-purple-100 px-2 py-0.5 rounded font-mono font-semibold">\(x(t) = e^{-\zeta\omega_n t}(A\cos\omega_d t + B\sin\omega_d t) + X\sin(\omega t - \phi)\)</span></li>
+                                </ul>
+                            </li>
+                            <li class="pt-2 text-sm text-slate-800 font-semibold">Finding A and B for Forced Systems:</li>
+                            <ul class="list-none space-y-2 text-sm text-slate-700 ml-4 border-l-2 border-purple-200 pl-3 pb-2">
+                                <li><strong>Disp. gap at \(t=0\):</strong> \( x_{trans}(0) = x_0 - X\sin(-\phi) \)<br> <span class="text-purple-700 font-bold">&rarr; This equals \(A\).</span></li>
+                                <li><strong>Vel. gap at \(t=0\):</strong> \( v_{trans}(0) = v_0 - \omega X\cos(-\phi) \)<br> <span class="text-purple-700 font-bold">&rarr; Use this in the standard Phase 2A derivative formulas to find \(B\).</span></li>
+                            </ul>
+                        </ol>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- TAB 3: CLOUD HISTORY -->
+        <div id="tab-history" class="hidden space-y-6">
+            <section class="bg-white rounded-xl shadow-lg p-6 md:p-8 border border-slate-200 min-h-[500px]">
+                <h2 class="text-2xl font-bold text-slate-800 mb-2 flex items-center justify-between border-b border-slate-200 pb-4">
+                    <span class="flex items-center">
+                        <span class="bg-indigo-100 text-indigo-700 rounded-lg px-3 py-1 mr-3 text-sm">Database</span>
+                        Saved Calculations
+                    </span>
+                    <button onclick="window.fetchHistory()" class="text-sm text-indigo-600 hover:text-indigo-800 font-medium px-3 py-1 bg-indigo-50 rounded">
+                        🔄 Refresh
+                    </button>
+                </h2>
+                
+                <div id="history-container" class="mt-6">
+                    <div class="text-center text-slate-400 py-12">
+                        <svg class="w-12 h-12 mx-auto mb-3 text-slate-300 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        <p>Loading your cloud history...</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+    </div>
+
     <!-- Application & Firebase Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Global Variables
+        // Global Variables attached to window to work with HTML onclick attributes
         window.isForced = false;
         window.isKCalcMode = false;
         window.isSimulating = false;
         window.simStartTime = 0;
         window.simHistory = [];
         window.simTheme = window.simTheme || 'classic';
-        window.currentCalculationData = null; // Holds the most recent complete calculation
+        window.currentCalculationData = null; 
         
         let currentUser = null;
         let db = null;
-        const appId = 'sdof-github-app';
 
-        // Helper formatting function
         window.fmt = (num, decimals = 4) => Number.isFinite(num) ? Number(num.toFixed(decimals)) : '0';
 
         // --- FIREBASE INITIALIZATION ---
         const initFirebase = async () => {
+            const statusBadge = document.getElementById('auth-status');
             try {
-                // Your exact Firebase configuration for GitHub Pages
-                const firebaseConfig = {
-                    apiKey: "AIzaSyA__ax18T1IWp94YAAGnTdkFlZfYPBOriM",
-                    authDomain: "web-app-1212d.firebaseapp.com",
-                    projectId: "web-app-1212d",
-                    storageBucket: "web-app-1212d.firebasestorage.app",
-                    messagingSenderId: "318666262482",
-                    appId: "1:318666262482:web:92d6fc9ad5f16d662bea0b",
-                    measurementId: "G-WVJ7MMTGM7"
-                };
+                // 1. Check if we're in the Sandbox Environment (Uses Sandbox Auth Tokens)
+                if (typeof __firebase_config !== 'undefined' && typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    const firebaseConfig = JSON.parse(__firebase_config);
+                    const app = initializeApp(firebaseConfig);
+                    const auth = getAuth(app);
+                    db = getFirestore(app);
+                    window.appId = typeof __app_id !== 'undefined' ? __app_id : 'sdof-default-app';
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } 
+                // 2. Otherwise, we are on GitHub Pages (Uses your personal Config)
+                else {
+                    const firebaseConfig = {
+                        apiKey: "AIzaSyA__ax18T1IWp94YAAGnTdkFlZfYPBOriM",
+                        authDomain: "web-app-1212d.firebaseapp.com",
+                        projectId: "web-app-1212d",
+                        storageBucket: "web-app-1212d.firebasestorage.app",
+                        messagingSenderId: "318666262482",
+                        appId: "1:318666262482:web:92d6fc9ad5f16d662bea0b",
+                        measurementId: "G-WVJ7MMTGM7"
+                    };
+                    const app = initializeApp(firebaseConfig);
+                    const auth = getAuth(app);
+                    db = getFirestore(app);
+                    window.appId = 'sdof-github-app';
+                    await signInAnonymously(auth);
+                }
 
-                const app = initializeApp(firebaseConfig);
-                const auth = getAuth(app);
-                db = getFirestore(app);
-
-                // Authenticate anonymously so users don't need to log in
-                await signInAnonymously(auth);
-
+                const auth = getAuth();
                 onAuthStateChanged(auth, (user) => {
                     currentUser = user;
-                    const statusBadge = document.getElementById('auth-status');
-                    if (user) {
-                        statusBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500 mr-2"></span> Cloud: Connected`;
-                        statusBadge.className = "absolute top-0 right-0 bg-emerald-50 text-emerald-700 text-xs px-3 py-1.5 rounded-full font-semibold border border-emerald-200 shadow-sm flex items-center";
-                        window.fetchHistory(); // Fetch history once logged in
-                    } else {
-                        statusBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-red-500 mr-2"></span> Disconnected`;
+                    if (statusBadge) {
+                        if (user) {
+                            statusBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500 mr-2"></span> Cloud: Connected`;
+                            statusBadge.className = "absolute top-0 right-0 bg-emerald-50 text-emerald-700 text-xs px-3 py-1.5 rounded-full font-semibold border border-emerald-200 shadow-sm flex items-center";
+                            window.fetchHistory(); 
+                        } else {
+                            statusBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-red-500 mr-2"></span> Disconnected`;
+                        }
                     }
                 });
             } catch(e) {
                 console.error("Firebase init failed:", e);
-                document.getElementById('auth-status').innerHTML = `<span class="w-2 h-2 rounded-full bg-red-500 mr-2"></span> Cloud Error`;
+                if (statusBadge) {
+                    let errMsg = "Cloud Error";
+                    if (e.message && e.message.includes('auth/admin-restricted-operation')) {
+                        errMsg = "Auth Restricted";
+                    }
+                    statusBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-red-500 mr-2"></span> ${errMsg}`;
+                }
             }
         };
 
-        // Initialize immediately
         initFirebase();
 
-
         // --- TAB NAVIGATION ---
-        function switchTab(tabId) {
-            const btnSolver = document.getElementById('tab-btn-solver');
-            const btnFormulas = document.getElementById('tab-btn-formulas');
-            const tabSolver = document.getElementById('tab-solver');
-            const tabFormulas = document.getElementById('tab-formulas');
+        window.switchTab = (tabId) => {
+            const tabs = ['solver', 'formulas', 'history'];
+            
+            tabs.forEach(t => {
+                const btn = document.getElementById(`tab-btn-${t}`);
+                const panel = document.getElementById(`tab-${t}`);
+                if (!btn || !panel) return;
+                
+                if(t === tabId) {
+                    panel.classList.remove('hidden');
+                    btn.classList.replace('text-slate-500', 'text-blue-700');
+                    btn.classList.replace('border-transparent', 'border-blue-700');
+                } else {
+                    panel.classList.add('hidden');
+                    btn.classList.replace('text-blue-700', 'text-slate-500');
+                    btn.classList.replace('border-blue-700', 'border-transparent');
+                }
+            });
 
-            if (tabId === 'solver') {
-                tabSolver.classList.remove('hidden');
-                tabFormulas.classList.add('hidden');
-                
-                btnSolver.classList.replace('text-slate-500', 'text-blue-700');
-                btnSolver.classList.replace('border-transparent', 'border-blue-700');
-                
-                btnFormulas.classList.replace('text-blue-700', 'text-slate-500');
-                btnFormulas.classList.replace('border-blue-700', 'border-transparent');
-            } else {
-                tabFormulas.classList.remove('hidden');
-                tabSolver.classList.add('hidden');
-                
-                btnFormulas.classList.replace('text-slate-500', 'text-blue-700');
-                btnFormulas.classList.replace('border-transparent', 'border-blue-700');
-                
-                btnSolver.classList.replace('text-blue-700', 'text-slate-500');
-                btnSolver.classList.replace('border-blue-700', 'border-transparent');
+            if (tabId === 'history') {
+                window.fetchHistory();
             }
         }
 
-        // --- SDOF SOLVER LOGIC ---
-        function setForceMode(mode) {
-            isForced = (mode === 'forced');
-            document.getElementById('btn-free').className = isForced ? "flex-1 py-1.5 text-sm font-bold rounded-md text-slate-500 hover:text-slate-800" : "flex-1 py-1.5 text-sm font-bold rounded-md bg-white shadow-sm text-slate-800";
-            document.getElementById('btn-forced').className = isForced ? "flex-1 py-1.5 text-sm font-bold rounded-md bg-white shadow-sm text-slate-800" : "flex-1 py-1.5 text-sm font-bold rounded-md text-slate-500 hover:text-slate-800";
-            document.getElementById('forced-inputs').style.display = isForced ? 'block' : 'none';
-            document.getElementById('free-inputs').style.display = isForced ? 'none' : 'block';
-            updateCalculations();
+        // --- SDOF SOLVER UI LOGIC ---
+        window.setForceMode = (mode) => {
+            window.isForced = (mode === 'forced');
+            document.getElementById('btn-free').className = window.isForced ? "flex-1 py-1.5 text-sm font-bold rounded-md text-slate-500 hover:text-slate-800" : "flex-1 py-1.5 text-sm font-bold rounded-md bg-white shadow-sm text-slate-800";
+            document.getElementById('btn-forced').className = window.isForced ? "flex-1 py-1.5 text-sm font-bold rounded-md bg-white shadow-sm text-slate-800" : "flex-1 py-1.5 text-sm font-bold rounded-md text-slate-500 hover:text-slate-800";
+            document.getElementById('forced-inputs').style.display = window.isForced ? 'block' : 'none';
+            document.getElementById('free-inputs').style.display = window.isForced ? 'none' : 'block';
+            window.updateCalculations();
         }
 
-        function toggleKMode() {
-            isKCalcMode = !isKCalcMode;
-            document.getElementById('k-direct-mode').style.display = isKCalcMode ? 'none' : 'block';
-            document.getElementById('k-calc-mode').style.display = isKCalcMode ? 'block' : 'none';
-            if (!isKCalcMode) document.getElementById('inp-dst').value = '';
+        window.toggleKMode = () => {
+            window.isKCalcMode = !window.isKCalcMode;
+            document.getElementById('k-direct-mode').style.display = window.isKCalcMode ? 'none' : 'block';
+            document.getElementById('k-calc-mode').style.display = window.isKCalcMode ? 'block' : 'none';
+            if (!window.isKCalcMode) document.getElementById('inp-dst').value = '';
         }
 
-        function calculateKFromDst() {
+        window.calculateKFromDst = () => {
             const m = parseFloat(document.getElementById('inp-m').value);
             const dst = parseFloat(document.getElementById('inp-dst').value);
             if (m > 0 && dst > 0) {
                 const k = (m * 10) / dst;
-                document.getElementById('inp-k').value = fmt(k);
-                updateCalculations();
+                document.getElementById('inp-k').value = window.fmt(k);
+                window.updateCalculations();
             }
         }
 
-        function loadExample(type) {
-            switchTab('solver'); 
+        window.changeTheme = (val) => { 
+            window.simTheme = val; 
+        };
+
+        window.loadExample = (type) => {
+            window.switchTab('solver'); 
             if (type === 'decay') {
-                // Classic 5% damped free vibration decay
                 document.getElementById('inp-m').value = 10;
                 document.getElementById('inp-k').value = 1000;
                 document.getElementById('inp-c').value = 10; 
                 document.getElementById('inp-x0').value = 0.2;
                 document.getElementById('inp-v0').value = 0;
-                setForceMode('free');
+                window.setForceMode('free');
             } else if (type === 'beating') {
-                // Forcing frequency near natural frequency creates a "beat" envelope
                 document.getElementById('inp-m').value = 10;
                 document.getElementById('inp-k').value = 1000;
-                document.getElementById('inp-c').value = 2; // Very low damping
+                document.getElementById('inp-c').value = 2;
                 document.getElementById('inp-x0').value = 0;
                 document.getElementById('inp-v0').value = 0;
-                setForceMode('forced');
+                window.setForceMode('forced');
                 document.getElementById('inp-f0').value = 100;
-                document.getElementById('inp-w').value = 8.5; // w near wn (which is 10)
+                document.getElementById('inp-w').value = 8.5;
             }
-            updateCalculations();
+            window.updateCalculations();
         }
 
-        function clearAll() {
+        window.clearAll = () => {
             document.querySelectorAll('input').forEach(input => input.value = '');
-            setForceMode('free');
-            updateCalculations();
+            window.setForceMode('free');
+            window.updateCalculations();
         }
 
-        function updateCalculations() {
+        // --- CLOUD SAVE LOGIC ---
+        window.saveCalculation = async () => {
+            if (!currentUser || !db || !window.currentCalculationData) return;
+            
+            try {
+                const savePayload = {
+                    ...window.currentCalculationData,
+                    timestamp: serverTimestamp()
+                };
+                
+                const userPath = collection(db, 'artifacts', window.appId, 'users', currentUser.uid, 'calculations');
+                await addDoc(userPath, savePayload);
+                
+                const toast = document.getElementById('save-toast');
+                toast.classList.remove('opacity-0', 'translate-y-[-20px]');
+                toast.classList.add('opacity-100', 'translate-y-0');
+                
+                setTimeout(() => {
+                    toast.classList.remove('opacity-100', 'translate-y-0');
+                    toast.classList.add('opacity-0', 'translate-y-[-20px]');
+                }, 3000);
+
+            } catch (e) {
+                console.error("Failed to save to cloud", e);
+            }
+        }
+
+        window.fetchHistory = () => {
+            const container = document.getElementById('history-container');
+            if (!container) return;
+            
+            if (!currentUser || !db) {
+                container.innerHTML = `<div class="text-center text-slate-500 py-12">Cloud database not connected.</div>`;
+                return;
+            }
+
+            const historyPath = collection(db, 'artifacts', window.appId, 'users', currentUser.uid, 'calculations');
+            
+            onSnapshot(historyPath, (snapshot) => {
+                if (snapshot.empty) {
+                    container.innerHTML = `<div class="text-center text-slate-500 py-12">No calculations saved yet.</div>`;
+                    return;
+                }
+
+                const records = [];
+                snapshot.forEach(doc => records.push({ id: doc.id, ...doc.data() }));
+                
+                records.sort((a, b) => {
+                    const timeA = a.timestamp ? a.timestamp.toMillis() : 0;
+                    const timeB = b.timestamp ? b.timestamp.toMillis() : 0;
+                    return timeB - timeA; 
+                });
+
+                let html = `<div class="grid grid-cols-1 md:grid-cols-2 gap-4">`;
+                records.forEach(rec => {
+                    const dateStr = rec.timestamp ? new Date(rec.timestamp.toMillis()).toLocaleString() : "Just now";
+                    const modeLabel = rec.isForced ? "Forced" : "Free";
+                    const modeColor = rec.isForced ? "bg-purple-100 text-purple-800" : "bg-emerald-100 text-emerald-800";
+                    
+                    html += `
+                    <div class="bg-slate-50 border border-slate-200 p-4 rounded-lg shadow-sm hover:shadow-md transition">
+                        <div class="flex justify-between items-start mb-3">
+                            <span class="${modeColor} text-xs font-bold px-2 py-1 rounded">${modeLabel} Vibration</span>
+                            <span class="text-xs text-slate-400">${dateStr}</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 text-sm text-slate-700 mb-3 border-b border-slate-200 pb-3">
+                            <div><span class="font-semibold text-slate-500">M:</span> ${rec.m} kg</div>
+                            <div><span class="font-semibold text-slate-500">K:</span> ${rec.k} N/m</div>
+                            <div><span class="font-semibold text-slate-500">C:</span> ${rec.c} Ns/m</div>
+                            <div><span class="font-semibold text-slate-500">&zeta;:</span> ${window.fmt(rec.zeta)}</div>
+                        </div>
+                        <div class="text-sm font-mono text-slate-800 bg-white p-2 border border-slate-200 rounded overflow-x-auto whitespace-nowrap">
+                            x(t) = ${rec.equation}
+                        </div>
+                        <button onclick="window.loadFromHistory('${rec.m}', '${rec.k}', '${rec.c}', '${rec.x0}', '${rec.v0}', '${rec.isForced}', '${rec.f0}', '${rec.w}')" class="mt-3 w-full text-center text-xs font-bold text-blue-600 hover:text-blue-800 py-1.5 bg-blue-50 hover:bg-blue-100 rounded transition">
+                            Load into Solver &rarr;
+                        </button>
+                    </div>`;
+                });
+                html += `</div>`;
+                container.innerHTML = html;
+
+            }, (error) => {
+                console.error("Firestore error:", error);
+                container.innerHTML = `<div class="text-center text-red-500 py-12">Failed to load history.</div>`;
+            });
+        }
+
+        window.loadFromHistory = (m, k, c, x0, v0, isForcedStr, f0, w) => {
+            window.switchTab('solver');
+            document.getElementById('inp-m').value = m;
+            document.getElementById('inp-k').value = k;
+            document.getElementById('inp-c').value = c;
+            document.getElementById('inp-x0').value = x0;
+            document.getElementById('inp-v0').value = v0;
+            
+            if (isForcedStr === "true") {
+                window.setForceMode('forced');
+                document.getElementById('inp-f0').value = f0 !== "undefined" ? f0 : "";
+                document.getElementById('inp-w').value = w !== "undefined" ? w : "";
+            } else {
+                window.setForceMode('free');
+            }
+            window.updateCalculations();
+        }
+
+        // --- MATH CALCULATOR ---
+        window.updateCalculations = () => {
             const m = parseFloat(document.getElementById('inp-m').value);
             const k = parseFloat(document.getElementById('inp-k').value);
             let c = parseFloat(document.getElementById('inp-c').value) || 0;
@@ -390,7 +603,8 @@
             const badge = document.getElementById('status-badge');
 
             if (isNaN(m) || isNaN(k) || m <= 0 || k <= 0) {
-                isSimulating = false; // Stop simulation if invalid
+                window.isSimulating = false; 
+                window.currentCalculationData = null;
                 badge.textContent = "Awaiting M and K...";
                 badge.className = "text-sm px-3 py-1 bg-slate-100 text-slate-500 rounded-full font-medium";
                 outputDiv.innerHTML = `<div class="text-center text-slate-400 py-12"><p class="text-lg">Please enter valid Mass (M) and Stiffness (K).</p></div>`;
@@ -401,7 +615,6 @@
             const cc = 2 * Math.sqrt(k * m);
             const zeta = c / cc;
 
-            // Define physical parameters to pass to the Simulator
             let wd = 0, s1 = 0, s2 = 0;
             let X = 0, rawPhi = 0;
             let A = 0, B = 0;
@@ -412,10 +625,9 @@
             else if (Math.abs(zeta - 1) < 0.001) { dampingType = "Critically Damped"; badgeColor = "bg-purple-100 text-purple-700"; }
             else { dampingType = "Overdamped"; badgeColor = "bg-orange-100 text-orange-700"; }
 
-            badge.textContent = `${isForced ? 'Forced' : 'Free'} - ${dampingType}`;
+            badge.textContent = `${window.isForced ? 'Forced' : 'Free'} - ${dampingType}`;
             badge.className = `text-sm px-3 py-1 rounded-full font-bold shadow-sm border border-black/10 ${badgeColor}`;
 
-            // Building the Dynamic HTML block including the visual canvas
             let html = `
             <div class="bg-slate-900 rounded-xl p-5 shadow-xl border border-slate-700 text-white mb-8">
                 <div class="flex justify-between items-center mb-4">
@@ -429,7 +641,7 @@
                             <option value="building" ${window.simTheme === 'building' ? 'selected' : ''}>Theme: Civil (Building)</option>
                             <option value="car" ${window.simTheme === 'car' ? 'selected' : ''}>Theme: Mech (Suspension)</option>
                         </select>
-                        <button onclick="resetSimulation()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded text-xs font-bold transition shadow">
+                        <button onclick="window.resetSimulation()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded text-xs font-bold transition shadow">
                             Restart (t=0)
                         </button>
                     </div>
@@ -442,15 +654,15 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 shadow-sm">
                         <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Natural Freq.</p>
-                        <p class="text-xl font-extrabold text-slate-800">\\( \\omega_n = ${fmt(wn)} \\)</p>
+                        <p class="text-xl font-extrabold text-slate-800">\\( \\omega_n = ${window.fmt(wn)} \\)</p>
                     </div>
                     <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 shadow-sm">
                         <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Critical Damping</p>
-                        <p class="text-xl font-extrabold text-slate-800">\\( C_c = ${fmt(cc)} \\)</p>
+                        <p class="text-xl font-extrabold text-slate-800">\\( C_c = ${window.fmt(cc)} \\)</p>
                     </div>
                     <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 shadow-sm ${badgeColor.replace('text-','text-opacity-80 text-')} border-opacity-50">
                         <p class="text-xs font-bold uppercase tracking-wider mb-2 opacity-80">Damping Ratio</p>
-                        <p class="text-xl font-extrabold">\\( \\zeta = ${fmt(zeta)} \\)</p>
+                        <p class="text-xl font-extrabold">\\( \\zeta = ${window.fmt(zeta)} \\)</p>
                     </div>
                 </div>
                 
@@ -459,96 +671,177 @@
                         🔍 View Calculation Steps for Holy Trinity
                     </summary>
                     <div class="p-4 border-t border-slate-100 bg-slate-50 text-sm space-y-3">
-                        <p class="math-block">\\( \\omega_n = \\sqrt{\\frac{K}{M}} = \\sqrt{\\frac{${fmt(k)}}{${fmt(m)}}} = \\mathbf{${fmt(wn)}} \\text{ rad/s} \\)</p>
-                        <p class="math-block">\\( C_c = 2\\sqrt{KM} = 2\\sqrt{${fmt(k)} \\times ${fmt(m)}} = \\mathbf{${fmt(cc)}} \\text{ Ns/m} \\)</p>
-                        <p class="math-block">\\( \\zeta = \\frac{C}{C_c} = \\frac{${fmt(c)}}{${fmt(cc)}} = \\mathbf{${fmt(zeta)}} \\)</p>
+                        <div class="mb-3 p-3 bg-blue-50 border-l-4 border-blue-400 text-blue-800 rounded text-xs leading-relaxed">
+                            <strong>💡 For Beginners: What are these?</strong><br>
+                            • <strong>Natural Freq (\(\omega_n\)):</strong> The system's natural "heartbeat" or how fast it wants to bounce.<br>
+                            • <strong>Critical Damping (\(C_c\)):</strong> The exact amount of friction brakes needed to stop the mass from bouncing entirely.<br>
+                            • <strong>Damping Ratio (\(\zeta\)):</strong> The percentage of those friction brakes we actually have.
+                        </div>
+                        <p class="math-block">\\( \\omega_n = \\sqrt{\\frac{K}{M}} = \\sqrt{\\frac{${window.fmt(k)}}{${window.fmt(m)}}} = \\mathbf{${window.fmt(wn)}} \\text{ rad/s} \\)</p>
+                        <p class="math-block">\\( C_c = 2\\sqrt{KM} = 2\\sqrt{${window.fmt(k)} \\times ${window.fmt(m)}} = \\mathbf{${window.fmt(cc)}} \\text{ Ns/m} \\)</p>
+                        <p class="math-block">\\( \\zeta = \\frac{C}{C_c} = \\frac{${window.fmt(c)}}{${window.fmt(cc)}} = \\mathbf{${window.fmt(zeta)}} \\)</p>
                     </div>
                 </details>
             </div>`;
 
             let finalEquationStr = "";
 
-            if (!isForced) {
+            if (!window.isForced) {
                 // =============== FREE VIBRATION ===============
-                html += `<div class="mb-8"><h3 class="text-xl font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4">2. General Free Response</h3>`;
+                html += `<div class="mb-8"><h3 class="text-xl font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4">2. General Equations of Motion</h3>`;
                 
                 if (zeta === 0) {
                     A = x0; B = v0 / wn;
-                    html += `<div class="bg-emerald-50 border-l-4 border-emerald-500 p-4 rounded-r-lg math-block mb-6">\\( x(t) = A \\cos(${fmt(wn)} t) + B \\sin(${fmt(wn)} t) \\)</div>
+                    html += `
+                    <div class="bg-emerald-50 border-l-4 border-emerald-500 p-4 rounded-r-lg mb-6 space-y-3 shadow-sm">
+                        <div>
+                            <p class="text-xs font-bold text-emerald-600 uppercase tracking-wider mb-1">Displacement Formula</p>
+                            <div class="math-block font-bold">\\( x(t) = A \\cos(${window.fmt(wn)} t) + B \\sin(${window.fmt(wn)} t) \\)</div>
+                        </div>
+                        <div class="border-t border-emerald-200 pt-3">
+                            <p class="text-xs font-bold text-emerald-600 uppercase tracking-wider mb-1">Velocity Formula (Derivative)</p>
+                            <div class="math-block font-bold">\\( v(t) = -${window.fmt(wn)}A \\sin(${window.fmt(wn)} t) + ${window.fmt(wn)}B \\cos(${window.fmt(wn)} t) \\)</div>
+                        </div>
+                    </div>
                     <h3 class="text-xl font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4">3. Applying Initial Conditions</h3>
-                    <p class="math-block">\\( x(0) = A = x_0 \\implies \\mathbf{A = ${fmt(A)}} \\)</p>
-                    <p class="math-block mb-4">\\( v(0) = B\\omega_n = v_0 \\implies B = \\frac{${fmt(v0)}}{${fmt(wn)}} = \\mathbf{${fmt(B)}} \\)</p>`;
-                    finalEquationStr = `x(t) = ${fmt(A)} \\cos(${fmt(wn)} t) + ${fmt(B)} \\sin(${fmt(wn)} t)`;
+                    <p class="math-block">\\( A = x_0 = \\mathbf{${window.fmt(A)}} \\)</p>
+                    <p class="math-block mb-4">\\( B = \\frac{v_0}{\\omega_n} = \\mathbf{${window.fmt(B)}} \\)</p>
+                    
+                    <details class="mt-4 group bg-white border border-slate-200 rounded-lg shadow-sm">
+                        <summary class="cursor-pointer font-semibold text-sm text-slate-600 p-3 hover:bg-slate-50 transition-colors">
+                            🔍 View Detailed Math for Constants A & B
+                        </summary>
+                        <div class="p-4 border-t border-slate-100 bg-slate-50 text-sm space-y-3">
+                            <div class="mb-3 p-3 bg-blue-50 border-l-4 border-blue-400 text-blue-800 rounded text-xs leading-relaxed">
+                                <strong>💡 For Beginners: Why do we do this?</strong><br>
+                                We have a generic equation, but we need to find the specific constants (A and B) for our exact starting conditions.<br>
+                                1. We plug in <strong>t = 0</strong> into the displacement equation to match our starting position (\(x_0\)).<br>
+                                2. To use our starting velocity (\(v_0\)), we must use calculus to find the <strong>derivative</strong> (the velocity equation), and then plug in <strong>t = 0</strong>.
+                            </div>
+                            <p class="text-slate-600 italic">Displacement equation at t=0:</p>
+                            <p class="math-block">\\( A = x_0 = \\mathbf{${window.fmt(A)}} \\)</p>
+                            <p class="text-slate-600 italic mt-4">Velocity equation at t=0:</p>
+                            <p class="math-block">\\( B\\omega_n = v_0 \\implies B = \\frac{${window.fmt(v0)}}{${window.fmt(wn)}} = \\mathbf{${window.fmt(B)}} \\)</p>
+                        </div>
+                    </details>`;
+                    finalEquationStr = `x(t) = ${window.fmt(A)} \\cos(${window.fmt(wn)} t) + ${window.fmt(B)} \\sin(${window.fmt(wn)} t)`;
 
                 } else if (zeta < 1) {
                     wd = wn * Math.sqrt(1 - Math.pow(zeta, 2));
                     const decay = zeta * wn;
                     A = x0; B = (v0 + decay * x0) / wd;
                     
-                    html += `<p class="math-block mb-2 text-blue-700">\\( \\omega_d = \\omega_n \\sqrt{1-\\zeta^2} = \\mathbf{${fmt(wd)} \\text{ rad/s}} \\)</p>
-                    <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg math-block mb-6">\\( x(t) = e^{-${fmt(decay)} t} \\left( A \\cos(${fmt(wd)} t) + B \\sin(${fmt(wd)} t) \\right) \\)</div>
+                    html += `<p class="math-block mb-2 text-blue-700">\\( \\omega_d = \\omega_n \\sqrt{1-\\zeta^2} = \\mathbf{${window.fmt(wd)} \\text{ rad/s}} \\)</p>
+                    <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg mb-6 space-y-3 shadow-sm">
+                        <div>
+                            <p class="text-xs font-bold text-blue-600 uppercase tracking-wider mb-1">Displacement Formula</p>
+                            <div class="math-block font-bold">\\( x(t) = e^{-${window.fmt(decay)} t} \\left( A \\cos(${window.fmt(wd)} t) + B \\sin(${window.fmt(wd)} t) \\right) \\)</div>
+                        </div>
+                        <div class="border-t border-blue-200 pt-3">
+                            <p class="text-xs font-bold text-blue-600 uppercase tracking-wider mb-1">Velocity Formula (Derivative)</p>
+                            <div class="math-block font-bold">\\( v(t) = e^{-${window.fmt(decay)} t} \\left[ (-${window.fmt(decay)}A + ${window.fmt(wd)}B)\\cos(${window.fmt(wd)}t) - (${window.fmt(decay)}B + ${window.fmt(wd)}A)\\sin(${window.fmt(wd)}t) \\right] \\)</div>
+                        </div>
+                    </div>
                     <h3 class="text-xl font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4">3. Applying Initial Conditions</h3>
-                    <p class="math-block">\\( A = x_0 = \\mathbf{${fmt(A)}} \\)</p>
-                    <p class="math-block mb-4">\\( B = \\frac{v_0 + \\zeta\\omega_n A}{\\omega_d} = \\mathbf{${fmt(B)}} \\)</p>
+                    <p class="math-block">\\( A = x_0 = \\mathbf{${window.fmt(A)}} \\)</p>
+                    <p class="math-block mb-4">\\( B = \\frac{v_0 + \\zeta\\omega_n A}{\\omega_d} = \\mathbf{${window.fmt(B)}} \\)</p>
                     
                     <details class="mt-4 group bg-white border border-slate-200 rounded-lg shadow-sm">
                         <summary class="cursor-pointer font-semibold text-sm text-slate-600 p-3 hover:bg-slate-50 transition-colors">
                             🔍 View Detailed Math for Constants A & B
                         </summary>
                         <div class="p-4 border-t border-slate-100 bg-slate-50 text-sm space-y-3">
+                            <div class="mb-3 p-3 bg-blue-50 border-l-4 border-blue-400 text-blue-800 rounded text-xs leading-relaxed">
+                                <strong>💡 For Beginners: Why do we do this?</strong><br>
+                                We have a generic equation, but we need to find the specific constants (A and B) for our exact starting conditions.<br>
+                                1. We plug in <strong>t = 0</strong> into the displacement equation to match our starting position (\(x_0\)).<br>
+                                2. To use our starting velocity (\(v_0\)), we must use calculus to find the <strong>derivative</strong> (the velocity equation), and then plug in <strong>t = 0</strong>.
+                            </div>
                             <p class="text-slate-600 italic">Finding the Damped Natural Frequency:</p>
-                            <p class="math-block">\\( \\omega_d = ${fmt(wn)}\\sqrt{1-(${fmt(zeta)})^2} = \\mathbf{${fmt(wd)}} \\)</p>
+                            <p class="math-block">\\( \\omega_d = ${window.fmt(wn)}\\sqrt{1-(${window.fmt(zeta)})^2} = \\mathbf{${window.fmt(wd)}} \\)</p>
                             <p class="text-slate-600 italic mt-4">Using Product Rule for Velocity: \\( v(0) = -\\zeta\\omega_n A + \\omega_d B = v_0 \\)</p>
-                            <p class="math-block">\\( B = \\frac{${fmt(v0)} + (${fmt(zeta)})(${fmt(wn)})(${fmt(A)})}{${fmt(wd)}} = \\frac{${fmt(v0)} + ${fmt(decay * A)}}{${fmt(wd)}} = \\mathbf{${fmt(B)}} \\)</p>
+                            <p class="math-block">\\( B = \\frac{${window.fmt(v0)} + (${window.fmt(zeta)})(${window.fmt(wn)})(${window.fmt(A)})}{${window.fmt(wd)}} = \\frac{${window.fmt(v0)} + ${window.fmt(decay * A)}}{${window.fmt(wd)}} = \\mathbf{${window.fmt(B)}} \\)</p>
                         </div>
                     </details>`;
-                    finalEquationStr = `x(t) = e^{-${fmt(decay)} t} \\left( ${fmt(A)} \\cos(${fmt(wd)} t) + ${fmt(B)} \\sin(${fmt(wd)} t) \\right)`;
+                    finalEquationStr = `x(t) = e^{-${window.fmt(decay)} t} \\left( ${window.fmt(A)} \\cos(${window.fmt(wd)} t) + ${window.fmt(B)} \\sin(${window.fmt(wd)} t) \\right)`;
 
                 } else if (Math.abs(zeta - 1) < 0.001) {
                     A = x0; B = v0 + wn * x0;
-                    html += `<div class="bg-purple-50 border-l-4 border-purple-500 p-4 rounded-r-lg math-block mb-6">\\( x(t) = (A + Bt) e^{-${fmt(wn)} t} \\)</div>
+                    html += `
+                    <div class="bg-purple-50 border-l-4 border-purple-500 p-4 rounded-r-lg mb-6 space-y-3 shadow-sm">
+                        <div>
+                            <p class="text-xs font-bold text-purple-600 uppercase tracking-wider mb-1">Displacement Formula</p>
+                            <div class="math-block font-bold">\\( x(t) = (A + Bt) e^{-${window.fmt(wn)} t} \\)</div>
+                        </div>
+                        <div class="border-t border-purple-200 pt-3">
+                            <p class="text-xs font-bold text-purple-600 uppercase tracking-wider mb-1">Velocity Formula (Derivative)</p>
+                            <div class="math-block font-bold">\\( v(t) = [B - ${window.fmt(wn)}(A + Bt)] e^{-${window.fmt(wn)} t} \\)</div>
+                        </div>
+                    </div>
                     <h3 class="text-xl font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4">3. Applying Initial Conditions</h3>
-                    <p class="math-block">\\( A = x_0 = \\mathbf{${fmt(A)}} \\)</p>
-                    <p class="math-block mb-4">\\( B = v_0 + \\omega_n A = \\mathbf{${fmt(B)}} \\)</p>
+                    <p class="math-block">\\( A = x_0 = \\mathbf{${window.fmt(A)}} \\)</p>
+                    <p class="math-block mb-4">\\( B = v_0 + \\omega_n A = \\mathbf{${window.fmt(B)}} \\)</p>
                     
                     <details class="mt-4 group bg-white border border-slate-200 rounded-lg shadow-sm">
                         <summary class="cursor-pointer font-semibold text-sm text-slate-600 p-3 hover:bg-slate-50 transition-colors">
                             🔍 View Detailed Math for Constants A & B
                         </summary>
                         <div class="p-4 border-t border-slate-100 bg-slate-50 text-sm space-y-3">
+                            <div class="mb-3 p-3 bg-blue-50 border-l-4 border-blue-400 text-blue-800 rounded text-xs leading-relaxed">
+                                <strong>💡 For Beginners: Why do we do this?</strong><br>
+                                We have a generic equation, but we need to find the specific constants (A and B) for our exact starting conditions.<br>
+                                1. We plug in <strong>t = 0</strong> into the displacement equation to match our starting position (\(x_0\)).<br>
+                                2. To use our starting velocity (\(v_0\)), we must use calculus to find the <strong>derivative</strong> (the velocity equation), and then plug in <strong>t = 0</strong>.
+                            </div>
                             <p class="text-slate-600 italic">Derivative for Velocity: \\( v(0) = B - \\omega_n A = v_0 \\)</p>
-                            <p class="math-block">\\( B = ${fmt(v0)} + (${fmt(wn)})(${fmt(A)}) = \\mathbf{${fmt(B)}} \\)</p>
+                            <p class="math-block">\\( B = ${window.fmt(v0)} + (${window.fmt(wn)})(${window.fmt(A)}) = \\mathbf{${window.fmt(B)}} \\)</p>
                         </div>
                     </details>`;
-                    finalEquationStr = `x(t) = (${fmt(A)} + ${fmt(B)}t) e^{-${fmt(wn)} t}`;
+                    finalEquationStr = `x(t) = (${window.fmt(A)} + ${window.fmt(B)}t) e^{-${window.fmt(wn)} t}`;
 
                 } else {
                     const root = wn * Math.sqrt(Math.pow(zeta, 2) - 1);
                     s1 = -zeta*wn + root; s2 = -zeta*wn - root;
                     A = (v0 - s2*x0)/(s1 - s2); B = (s1*x0 - v0)/(s1 - s2);
-                    html += `<p class="math-block mb-2 text-orange-700">Roots: \\( s_1 = ${fmt(s1)}, s_2 = ${fmt(s2)} \\)</p>
-                    <div class="bg-orange-50 border-l-4 border-orange-500 p-4 rounded-r-lg math-block mb-6">\\( x(t) = A e^{${fmt(s1)} t} + B e^{${fmt(s2)} t} \\)</div>
+                    html += `
+                    <div class="bg-orange-50 border-l-4 border-orange-500 p-4 rounded-r-lg mb-6 space-y-3 shadow-sm">
+                        <div>
+                            <p class="text-xs font-bold text-orange-600 uppercase tracking-wider mb-1">Displacement Formula</p>
+                            <div class="math-block font-bold">\\( x(t) = A e^{${window.fmt(s1)} t} + B e^{${window.fmt(s2)} t} \\)</div>
+                        </div>
+                        <div class="border-t border-orange-200 pt-3">
+                            <p class="text-xs font-bold text-orange-600 uppercase tracking-wider mb-1">Velocity Formula (Derivative)</p>
+                            <div class="math-block font-bold">\\( v(t) = ${window.fmt(s1)}A e^{${window.fmt(s1)} t} + ${window.fmt(s2)}B e^{${window.fmt(s2)} t} \\)</div>
+                        </div>
+                    </div>
                     <h3 class="text-xl font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4">3. Applying Initial Conditions</h3>
-                    <p class="math-block">\\( A = \\mathbf{${fmt(A)}} \\)</p>
-                    <p class="math-block mb-4">\\( B = \\mathbf{${fmt(B)}} \\)</p>
+                    <p class="math-block">\\( A = \\mathbf{${window.fmt(A)}} \\)</p>
+                    <p class="math-block mb-4">\\( B = \\mathbf{${window.fmt(B)}} \\)</p>
                     
                     <details class="mt-4 group bg-white border border-slate-200 rounded-lg shadow-sm">
                         <summary class="cursor-pointer font-semibold text-sm text-slate-600 p-3 hover:bg-slate-50 transition-colors">
                             🔍 View Detailed Math for Constants A & B
                         </summary>
                         <div class="p-4 border-t border-slate-100 bg-slate-50 text-sm space-y-3">
-                            <p class="math-block">\\( A = \\frac{v_0 - s_2 x_0}{s_1 - s_2} = \\frac{${fmt(v0)} - (${fmt(s2)})(${fmt(x0)})}{${fmt(s1)} - (${fmt(s2)})} = \\mathbf{${fmt(A)}} \\)</p>
-                            <p class="math-block">\\( B = \\frac{s_1 x_0 - v_0}{s_1 - s_2} = \\frac{(${fmt(s1)})(${fmt(x0)}) - ${fmt(v0)}}{${fmt(s1)} - (${fmt(s2)})} = \\mathbf{${fmt(B)}} \\)</p>
+                            <div class="mb-3 p-3 bg-blue-50 border-l-4 border-blue-400 text-blue-800 rounded text-xs leading-relaxed">
+                                <strong>💡 For Beginners: Why do we do this?</strong><br>
+                                We have a generic equation, but we need to find the specific constants (A and B) for our exact starting conditions.<br>
+                                1. We plug in <strong>t = 0</strong> into the displacement equation to match our starting position (\(x_0\)).<br>
+                                2. To use our starting velocity (\(v_0\)), we must use calculus to find the <strong>derivative</strong> (the velocity equation), and then plug in <strong>t = 0</strong>.
+                            </div>
+                            <p class="math-block">\\( A = \\frac{v_0 - s_2 x_0}{s_1 - s_2} = \\frac{${window.fmt(v0)} - (${window.fmt(s2)})(${window.fmt(x0)})}{${window.fmt(s1)} - (${window.fmt(s2)})} = \\mathbf{${window.fmt(A)}} \\)</p>
+                            <p class="math-block">\\( B = \\frac{s_1 x_0 - v_0}{s_1 - s_2} = \\frac{(${window.fmt(s1)})(${window.fmt(x0)}) - ${window.fmt(v0)}}{${window.fmt(s1)} - (${window.fmt(s2)})} = \\mathbf{${window.fmt(B)}} \\)</p>
                         </div>
                     </details>`;
-                    finalEquationStr = `x(t) = ${fmt(A)} e^{${fmt(s1)} t} + ${fmt(B)} e^{${fmt(s2)} t}`;
+                    finalEquationStr = `x(t) = ${window.fmt(A)} e^{${window.fmt(s1)} t} + ${window.fmt(B)} e^{${window.fmt(s2)} t}`;
                 }
                 html += `</div>`;
 
             } else {
                 // =============== FORCED VIBRATION ===============
                 if (isNaN(f0) || isNaN(w) || w <= 0) {
-                    isSimulating = false;
+                    window.isSimulating = false;
+                    window.currentCalculationData = null;
                     html += `<div class="text-center text-slate-400 py-12"><p class="text-lg">Enter Force details to continue...</p></div>`;
                     outputDiv.innerHTML = html; 
                     if (window.MathJax) MathJax.typesetPromise([outputDiv]).catch(console.error);
@@ -565,25 +858,31 @@
                 html += `<div class="mb-8">
                     <h3 class="text-xl font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4">2. Steady State Properties</h3>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                        <div class="bg-white p-3 rounded shadow-sm border border-slate-100 text-center"><p class="text-xs text-slate-500 font-bold mb-1">Freq Ratio (r)</p><p class="font-mono">${fmt(r)}</p></div>
-                        <div class="bg-white p-3 rounded shadow-sm border border-slate-100 text-center"><p class="text-xs text-slate-500 font-bold mb-1">Static Disp (X₀)</p><p class="font-mono">${fmt(X0)} m</p></div>
-                        <div class="bg-indigo-50 p-3 rounded shadow-sm border border-indigo-100 text-center"><p class="text-xs text-indigo-700 font-bold mb-1">Amplitude (X)</p><p class="font-mono font-bold">${fmt(X)} m</p></div>
-                        <div class="bg-indigo-50 p-3 rounded shadow-sm border border-indigo-100 text-center"><p class="text-xs text-indigo-700 font-bold mb-1">Phase (φ)</p><p class="font-mono font-bold">${fmt(rawPhi)} rad</p></div>
+                        <div class="bg-white p-3 rounded shadow-sm border border-slate-100 text-center"><p class="text-xs text-slate-500 font-bold mb-1">Freq Ratio (r)</p><p class="font-mono">${window.fmt(r)}</p></div>
+                        <div class="bg-white p-3 rounded shadow-sm border border-slate-100 text-center"><p class="text-xs text-slate-500 font-bold mb-1">Static Disp (X₀)</p><p class="font-mono">${window.fmt(X0)} m</p></div>
+                        <div class="bg-indigo-50 p-3 rounded shadow-sm border border-indigo-100 text-center"><p class="text-xs text-indigo-700 font-bold mb-1">Amplitude (X)</p><p class="font-mono font-bold">${window.fmt(X)} m</p></div>
+                        <div class="bg-indigo-50 p-3 rounded shadow-sm border border-indigo-100 text-center"><p class="text-xs text-indigo-700 font-bold mb-1">Phase (φ)</p><p class="font-mono font-bold">${window.fmt(rawPhi)} rad</p></div>
                     </div>`;
 
                 if(r > 1) html += `<div class="bg-red-50 text-red-700 p-3 rounded border border-red-200 text-sm mb-4"><strong>Phase Trap Triggered:</strong> \\( r > 1 \\), added \\( 180^\\circ \\) to phase angle!<br><span class="text-xs"><em>(Conversion: \\( \\text{Radians} = \\text{Degrees} \\times \\frac{\\pi}{180} \\))</em></span></div>`;
 
-                html += `<div class="bg-slate-50 border-l-4 border-slate-400 p-4 rounded-r-lg math-block mb-4">\\( x_p(t) = ${fmt(X)}\\sin(${fmt(w)}t - ${fmt(rawPhi)}) \\)</div>
+                html += `<div class="bg-slate-50 border-l-4 border-slate-400 p-4 rounded-r-lg math-block mb-4">\\( x_p(t) = ${window.fmt(X)}\\sin(${window.fmt(w)}t - ${window.fmt(rawPhi)}) \\)</div>
                 
                 <details class="mt-4 group bg-white border border-slate-200 rounded-lg shadow-sm">
                     <summary class="cursor-pointer font-semibold text-sm text-slate-600 p-3 hover:bg-slate-50 transition-colors">
                         🔍 View Calculation Steps for Steady State Math
                     </summary>
                     <div class="p-4 border-t border-slate-100 bg-slate-50 text-sm space-y-3">
-                        <p class="math-block">\\( r = \\frac{\\omega}{\\omega_n} = \\frac{${fmt(w)}}{${fmt(wn)}} = \\mathbf{${fmt(r)}} \\)</p>
-                        <p class="math-block">\\( X_0 = \\frac{F_0}{K} = \\frac{${fmt(f0)}}{${fmt(k)}} = \\mathbf{${fmt(X0)}} \\)</p>
-                        <p class="math-block">\\( X = \\frac{X_0}{\\sqrt{(1-r^2)^2 + (2\\zeta r)^2}} = \\frac{${fmt(X0)}}{\\sqrt{(1-${fmt(r)}^2)^2 + (2(${fmt(zeta)})(${fmt(r)}))^2}} = \\frac{${fmt(X0)}}{\\sqrt{(${fmt(denom1)})^2 + (${fmt(denom2)})^2}} = \\mathbf{${fmt(X)}} \\)</p>
-                        <p class="math-block">\\( \\phi = \\tan^{-1}\\left(\\frac{2\\zeta r}{1-r^2}\\right) = \\tan^{-1}\\left(\\frac{${fmt(denom2)}}{${fmt(denom1)}}\\right) = \\mathbf{${fmt(rawPhi)} \\text{ rad}} \\)</p>
+                        <div class="mb-3 p-3 bg-blue-50 border-l-4 border-blue-400 text-blue-800 rounded text-xs leading-relaxed">
+                            <strong>💡 For Beginners: What do these mean?</strong><br>
+                            • <strong>Freq Ratio (\(r\)):</strong> Compares the motor's speed to the natural bounce speed. If \(r=1\), it's Resonance (pushing a child on a swing at the perfect time to make them go higher and higher!).<br>
+                            • <strong>Static Disp (\(X_0\)):</strong> How far the spring would compress if you just rested the motor's force on it without actually spinning.<br>
+                            • <strong>Phase Angle (\(\phi\)):</strong> The "delay" or "lag" between the motor pushing and the mass actually moving.
+                        </div>
+                        <p class="math-block">\\( r = \\frac{\\omega}{\\omega_n} = \\frac{${window.fmt(w)}}{${window.fmt(wn)}} = \\mathbf{${window.fmt(r)}} \\)</p>
+                        <p class="math-block">\\( X_0 = \\frac{F_0}{K} = \\frac{${window.fmt(f0)}}{${window.fmt(k)}} = \\mathbf{${window.fmt(X0)}} \\)</p>
+                        <p class="math-block">\\( X = \\frac{X_0}{\\sqrt{(1-r^2)^2 + (2\\zeta r)^2}} = \\frac{${window.fmt(X0)}}{\\sqrt{(1-${window.fmt(r)}^2)^2 + (2(${window.fmt(zeta)})(${window.fmt(r)}))^2}} = \\frac{${window.fmt(X0)}}{\\sqrt{(${window.fmt(denom1)})^2 + (${window.fmt(denom2)})^2}} = \\mathbf{${window.fmt(X)}} \\)</p>
+                        <p class="math-block">\\( \\phi = \\tan^{-1}\\left(\\frac{2\\zeta r}{1-r^2}\\right) = \\tan^{-1}\\left(\\frac{${window.fmt(denom2)}}{${window.fmt(denom1)}}\\right) = \\mathbf{${window.fmt(rawPhi)} \\text{ rad}} \\)</p>
                     </div>
                 </details>
                 </div>`;
@@ -593,51 +892,84 @@
                 
                 const x_steady_0 = X * Math.sin(-rawPhi);
                 const v_steady_0 = w * X * Math.cos(-rawPhi);
-                const C0 = x0 - x_steady_0; // Transient needs to cover this gap
+                const C0 = x0 - x_steady_0; 
                 const C1 = v0 - v_steady_0; 
 
-                html += `<p class="mb-4 text-sm text-slate-700">We must apply the initial conditions to the <strong>Complete Equation</strong> (Transient + Steady State).<br>
-                \\( x_{trans}(0) = x_0 - x_{ss}(0) = \\mathbf{${fmt(C0)}} \\)<br>
-                \\( v_{trans}(0) = v_0 - v_{ss}(0) = \\mathbf{${fmt(C1)}} \\)</p>`;
+                // --- Generate explicit equations for Forced Vibration ---
+                let genDispStr = "";
+                let genVelStr = "";
+                if (zeta === 0) {
+                    genDispStr = `A\\cos(${window.fmt(wn)}t) + B\\sin(${window.fmt(wn)}t) + ${window.fmt(X)}\\sin(${window.fmt(w)}t - ${window.fmt(rawPhi)})`;
+                    genVelStr = `-${window.fmt(wn)}A\\sin(${window.fmt(wn)}t) + ${window.fmt(wn)}B\\cos(${window.fmt(wn)}t) + ${window.fmt(X * w)}\\cos(${window.fmt(w)}t - ${window.fmt(rawPhi)})`;
+                } else if (zeta < 1) {
+                    let dcy = zeta * wn;
+                    wd = wn * Math.sqrt(1 - Math.pow(zeta, 2));
+                    genDispStr = `e^{-${window.fmt(dcy)}t}(A\\cos(${window.fmt(wd)}t) + B\\sin(${window.fmt(wd)}t)) + ${window.fmt(X)}\\sin(${window.fmt(w)}t - ${window.fmt(rawPhi)})`;
+                    genVelStr = `e^{-${window.fmt(dcy)}t}[(-${window.fmt(dcy)}A + ${window.fmt(wd)}B)\\cos(${window.fmt(wd)}t) - (${window.fmt(dcy)}B + ${window.fmt(wd)}A)\\sin(${window.fmt(wd)}t)] + ${window.fmt(X * w)}\\cos(${window.fmt(w)}t - ${window.fmt(rawPhi)})`;
+                } else if (Math.abs(zeta - 1) < 0.001) {
+                    genDispStr = `(A + Bt)e^{-${window.fmt(wn)}t} + ${window.fmt(X)}\\sin(${window.fmt(w)}t - ${window.fmt(rawPhi)})`;
+                    genVelStr = `[B - ${window.fmt(wn)}(A + Bt)]e^{-${window.fmt(wn)}t} + ${window.fmt(X * w)}\\cos(${window.fmt(w)}t - ${window.fmt(rawPhi)})`;
+                } else {
+                    const root = wn * Math.sqrt(Math.pow(zeta, 2) - 1);
+                    s1 = -zeta*wn + root; s2 = -zeta*wn - root;
+                    genDispStr = `Ae^{${window.fmt(s1)}t} + Be^{${window.fmt(s2)}t} + ${window.fmt(X)}\\sin(${window.fmt(w)}t - ${window.fmt(rawPhi)})`;
+                    genVelStr = `${window.fmt(s1)}Ae^{${window.fmt(s1)}t} + ${window.fmt(s2)}Be^{${window.fmt(s2)}t} + ${window.fmt(X * w)}\\cos(${window.fmt(w)}t - ${window.fmt(rawPhi)})`;
+                }
+
+                html += `
+                <div class="bg-indigo-50 border-l-4 border-indigo-500 p-4 rounded-r-lg mb-6 space-y-3 shadow-sm">
+                    <div>
+                        <p class="text-xs font-bold text-indigo-600 uppercase tracking-wider mb-1">Complete Displacement Equation</p>
+                        <div class="math-block font-bold">\\( x(t) = ${genDispStr} \\)</div>
+                    </div>
+                    <div class="border-t border-indigo-200 pt-3">
+                        <p class="text-xs font-bold text-indigo-600 uppercase tracking-wider mb-1">Complete Velocity Equation (Derivative)</p>
+                        <div class="math-block font-bold">\\( v(t) = ${genVelStr} \\)</div>
+                    </div>
+                </div>
+                
+                <p class="mb-4 text-sm text-slate-700">We must apply the initial conditions to the <strong>Complete Equation</strong>.<br>
+                \\( x_{trans}(0) = x_0 - x_{ss}(0) = \\mathbf{${window.fmt(C0)}} \\)<br>
+                \\( v_{trans}(0) = v_0 - v_{ss}(0) = \\mathbf{${window.fmt(C1)}} \\)</p>`;
 
                 let transientStepHTML = "";
                 if (zeta === 0) {
                     A = C0; B = C1 / wn;
-                    finalEquationStr = `${fmt(A)}\\cos(${fmt(wn)}t) + ${fmt(B)}\\sin(${fmt(wn)}t) + ${fmt(X)}\\sin(${fmt(w)}t - ${fmt(rawPhi)})`;
+                    finalEquationStr = `${window.fmt(A)}\\cos(${window.fmt(wn)}t) + ${window.fmt(B)}\\sin(${window.fmt(wn)}t) + ${window.fmt(X)}\\sin(${window.fmt(w)}t - ${window.fmt(rawPhi)})`;
                     transientStepHTML = `
-                        <p class="math-block">\\( A = x_{trans}(0) = \\mathbf{${fmt(A)}} \\)</p>
-                        <p class="math-block">\\( B = \\frac{v_{trans}(0)}{\\omega_n} = \\frac{${fmt(C1)}}{${fmt(wn)}} = \\mathbf{${fmt(B)}} \\)</p>
+                        <p class="math-block">\\( A = x_{trans}(0) = \\mathbf{${window.fmt(A)}} \\)</p>
+                        <p class="math-block">\\( B = \\frac{v_{trans}(0)}{\\omega_n} = \\frac{${window.fmt(C1)}}{${window.fmt(wn)}} = \\mathbf{${window.fmt(B)}} \\)</p>
                     `;
                 } else if (zeta < 1) {
                     wd = wn * Math.sqrt(1 - Math.pow(zeta, 2));
                     const decay = zeta * wn;
                     A = C0; B = (C1 + decay * A) / wd;
-                    finalEquationStr = `e^{-${fmt(decay)}t}\\left(${fmt(A)}\\cos(${fmt(wd)}t) + ${fmt(B)}\\sin(${fmt(wd)}t)\\right) + ${fmt(X)}\\sin(${fmt(w)}t - ${fmt(rawPhi)})`;
+                    finalEquationStr = `e^{-${window.fmt(decay)}t}\\left(${window.fmt(A)}\\cos(${window.fmt(wd)}t) + ${window.fmt(B)}\\sin(${window.fmt(wd)}t)\\right) + ${window.fmt(X)}\\sin(${window.fmt(w)}t - ${window.fmt(rawPhi)})`;
                     transientStepHTML = `
-                        <p class="math-block">\\( A = x_{trans}(0) = \\mathbf{${fmt(A)}} \\)</p>
-                        <p class="math-block">\\( B = \\frac{v_{trans}(0) + \\zeta\\omega_n A}{\\omega_d} = \\frac{${fmt(C1)} + (${fmt(decay)})(${fmt(A)})}{${fmt(wd)}} = \\mathbf{${fmt(B)}} \\)</p>
+                        <p class="math-block">\\( A = x_{trans}(0) = \\mathbf{${window.fmt(A)}} \\)</p>
+                        <p class="math-block">\\( B = \\frac{v_{trans}(0) + \\zeta\\omega_n A}{\\omega_d} = \\frac{${window.fmt(C1)} + (${window.fmt(decay)})(${window.fmt(A)})}{${window.fmt(wd)}} = \\mathbf{${window.fmt(B)}} \\)</p>
                     `;
                 } else if (Math.abs(zeta - 1) < 0.001) {
                     A = C0; B = C1 + wn * A;
-                    finalEquationStr = `(${fmt(A)} + ${fmt(B)}t)e^{-${fmt(wn)}t} + ${fmt(X)}\\sin(${fmt(w)}t - ${fmt(rawPhi)})`;
+                    finalEquationStr = `(${window.fmt(A)} + ${window.fmt(B)}t)e^{-${window.fmt(wn)}t} + ${window.fmt(X)}\\sin(${window.fmt(w)}t - ${window.fmt(rawPhi)})`;
                     transientStepHTML = `
-                        <p class="math-block">\\( A = x_{trans}(0) = \\mathbf{${fmt(A)}} \\)</p>
-                        <p class="math-block">\\( B = v_{trans}(0) + \\omega_n A = ${fmt(C1)} + (${fmt(wn)})(${fmt(A)}) = \\mathbf{${fmt(B)}} \\)</p>
+                        <p class="math-block">\\( A = x_{trans}(0) = \\mathbf{${window.fmt(A)}} \\)</p>
+                        <p class="math-block">\\( B = v_{trans}(0) + \\omega_n A = ${window.fmt(C1)} + (${window.fmt(wn)})(${window.fmt(A)}) = \\mathbf{${window.fmt(B)}} \\)</p>
                     `;
                 } else {
                     const root = wn * Math.sqrt(Math.pow(zeta, 2) - 1);
                     s1 = -zeta*wn + root; s2 = -zeta*wn - root;
                     A = (C1 - s2*C0)/(s1 - s2); B = (s1*C0 - C1)/(s1 - s2);
-                    finalEquationStr = `${fmt(A)}e^{${fmt(s1)}t} + ${fmt(B)}e^{${fmt(s2)}t} + ${fmt(X)}\\sin(${fmt(w)}t - ${fmt(rawPhi)})`;
+                    finalEquationStr = `${window.fmt(A)}e^{${window.fmt(s1)}t} + ${window.fmt(B)}e^{${window.fmt(s2)}t} + ${window.fmt(X)}\\sin(${window.fmt(w)}t - ${window.fmt(rawPhi)})`;
                     transientStepHTML = `
-                        <p class="math-block">\\( A = \\frac{v_{trans}(0) - s_2 x_{trans}(0)}{s_1 - s_2} = \\frac{${fmt(C1)} - (${fmt(s2)})(${fmt(C0)})}{${fmt(s1)} - (${fmt(s2)})} = \\mathbf{${fmt(A)}} \\)</p>
-                        <p class="math-block">\\( B = \\frac{s_1 x_{trans}(0) - v_{trans}(0)}{s_1 - s_2} = \\frac{(${fmt(s1)})(${fmt(C0)}) - ${fmt(C1)}}{${fmt(s1)} - (${fmt(s2)})} = \\mathbf{${fmt(B)}} \\)</p>
+                        <p class="math-block">\\( A = \\frac{v_{trans}(0) - s_2 x_{trans}(0)}{s_1 - s_2} = \\frac{${window.fmt(C1)} - (${window.fmt(s2)})(${window.fmt(C0)})}{${window.fmt(s1)} - (${window.fmt(s2)})} = \\mathbf{${window.fmt(A)}} \\)</p>
+                        <p class="math-block">\\( B = \\frac{s_1 x_{trans}(0) - v_{trans}(0)}{s_1 - s_2} = \\frac{(${window.fmt(s1)})(${window.fmt(C0)}) - ${window.fmt(C1)}}{${window.fmt(s1)} - (${window.fmt(s2)})} = \\mathbf{${window.fmt(B)}} \\)</p>
                     `;
                 }
                 
                 html += `<div class="grid grid-cols-2 gap-4 mb-4">
-                    <div class="bg-white p-3 rounded shadow-sm border border-slate-200"><p class="text-sm font-bold text-slate-500 mb-1">Constant A</p><p class="font-mono text-lg font-bold">\\( ${fmt(A)} \\)</p></div>
-                    <div class="bg-white p-3 rounded shadow-sm border border-slate-200"><p class="text-sm font-bold text-slate-500 mb-1">Constant B</p><p class="font-mono text-lg font-bold">\\( ${fmt(B)} \\)</p></div>
+                    <div class="bg-white p-3 rounded shadow-sm border border-slate-200"><p class="text-sm font-bold text-slate-500 mb-1">Constant A</p><p class="font-mono text-lg font-bold">\\( ${window.fmt(A)} \\)</p></div>
+                    <div class="bg-white p-3 rounded shadow-sm border border-slate-200"><p class="text-sm font-bold text-slate-500 mb-1">Constant B</p><p class="font-mono text-lg font-bold">\\( ${window.fmt(B)} \\)</p></div>
                 </div>
                 
                 <details class="mt-4 group bg-white border border-slate-200 rounded-lg shadow-sm">
@@ -645,12 +977,17 @@
                         🔍 View Calculation Steps for the Transient Gap & Constants
                     </summary>
                     <div class="p-4 border-t border-slate-100 bg-slate-50 text-sm space-y-3">
+                        <div class="mb-3 p-3 bg-blue-50 border-l-4 border-blue-400 text-blue-800 rounded text-xs leading-relaxed">
+                            <strong>💡 For Beginners: What is the "Gap"?</strong><br>
+                            The Steady-State wave assumes the motor has been running forever. At exactly \(t=0\), the steady wave expects the mass to be exactly at \(x_{ss}(0)\). But in reality, the mass is sitting at our initial condition \(x_0\).<br>
+                            The <strong>Transient Solution</strong> acts like a temporary bridge. It must perfectly cover the "gap" between where the mass actually starts and where the steady-state wave expects it to be!
+                        </div>
                         <p class="text-slate-600 italic">1. Find where the steady-state equation physically is at t=0:</p>
-                        <p class="math-block">\\( x_{ss}(0) = X\\sin(-\\phi) = ${fmt(X)}\\sin(-${fmt(rawPhi)}) = \\mathbf{${fmt(x_steady_0)}} \\)</p>
-                        <p class="math-block">\\( v_{ss}(0) = \\omega X\\cos(-\\phi) = ${fmt(w)}(${fmt(X)})\\cos(-${fmt(rawPhi)}) = \\mathbf{${fmt(v_steady_0)}} \\)</p>
+                        <p class="math-block">\\( x_{ss}(0) = X\\sin(-\\phi) = ${window.fmt(X)}\\sin(-${window.fmt(rawPhi)}) = \\mathbf{${window.fmt(x_steady_0)}} \\)</p>
+                        <p class="math-block">\\( v_{ss}(0) = \\omega X\\cos(-\\phi) = ${window.fmt(w)}(${window.fmt(X)})\\cos(-${window.fmt(rawPhi)}) = \\mathbf{${window.fmt(v_steady_0)}} \\)</p>
                         <p class="text-slate-600 italic mt-4">2. Calculate the "Gap" the transient solution must correct for:</p>
-                        <p class="math-block">\\( x_{trans}(0) = x_0 - x_{ss}(0) = ${fmt(x0)} - (${fmt(x_steady_0)}) = \\mathbf{${fmt(C0)}} \\)</p>
-                        <p class="math-block">\\( v_{trans}(0) = v_0 - v_{ss}(0) = ${fmt(v0)} - (${fmt(v_steady_0)}) = \\mathbf{${fmt(C1)}} \\)</p>
+                        <p class="math-block">\\( x_{trans}(0) = x_0 - x_{ss}(0) = ${window.fmt(x0)} - (${window.fmt(x_steady_0)}) = \\mathbf{${window.fmt(C0)}} \\)</p>
+                        <p class="math-block">\\( v_{trans}(0) = v_0 - v_{ss}(0) = ${window.fmt(v0)} - (${window.fmt(v_steady_0)}) = \\mathbf{${window.fmt(C1)}} \\)</p>
                         <p class="text-slate-600 italic mt-4">3. Solve for Constants using the Transient Initial Conditions:</p>
                         ${transientStepHTML}
                     </div>
@@ -658,41 +995,50 @@
                 </div>`;
             }
 
-            // SECTION: FINAL EQUATION
+            // SECTION: FINAL EQUATION & SAVE BUTTON
             html += `
             <div class="bg-gray-900 rounded-xl p-6 shadow-xl border border-gray-700 text-white">
                 <h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">Final Complete Equation</h3>
-                <div class="math-block text-xl md:text-2xl font-bold">
+                <div class="math-block text-xl md:text-2xl font-bold mb-6">
                     \\( x(t) = ${finalEquationStr} \\)
                 </div>
+                <button onclick="window.saveCalculation()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 px-4 rounded-lg shadow transition duration-200 flex justify-center items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
+                    Save Calculation to Cloud
+                </button>
             </div>`;
 
-            // Export parameters to the simulator
+            // Export parameters to the simulator & Cloud Payload
             window.simData = {
-                isForced: isForced, zeta: zeta, wn: wn, wd: wd, s1: s1, s2: s2,
-                A: A, B: B, X: (isForced && !isNaN(X) ? X : 0), w: (isForced && !isNaN(w) ? w : 0), phi: (isForced && !isNaN(rawPhi) ? rawPhi : 0),
+                isForced: window.isForced, zeta: zeta, wn: wn, wd: wd, s1: s1, s2: s2,
+                A: A, B: B, X: (window.isForced && !isNaN(X) ? X : 0), w: (window.isForced && !isNaN(w) ? w : 0), phi: (window.isForced && !isNaN(rawPhi) ? rawPhi : 0),
                 x0: x0, v0: v0
+            };
+
+            window.currentCalculationData = {
+                m: m, k: k, c: c, x0: x0, v0: v0,
+                isForced: window.isForced, f0: f0, w: w,
+                zeta: zeta, equation: finalEquationStr.replace(/\\/g, '\\\\') 
             };
 
             outputDiv.innerHTML = html;
             if (window.MathJax) MathJax.typesetPromise([outputDiv]).catch(console.error);
 
             // Trigger Animation
-            resetSimulation();
+            window.resetSimulation();
         }
 
         // --- SIMULATION ENGINE LOGIC ---
-        function resetSimulation() {
-            simStartTime = performance.now();
-            simHistory = [];
-            if (!isSimulating) {
-                isSimulating = true;
-                requestAnimationFrame(simulationLoop);
+        window.resetSimulation = () => {
+            window.simStartTime = performance.now();
+            window.simHistory = [];
+            if (!window.isSimulating) {
+                window.isSimulating = true;
+                requestAnimationFrame(window.simulationLoop);
             }
         }
 
-        // Mathematical Evaluator for the Live Animation
-        function evaluateX(t) {
+        window.evaluateX = (t) => {
             if (!window.simData) return 0;
             const d = window.simData;
             let x_trans = 0;
@@ -709,43 +1055,35 @@
             return x_trans + x_steady;
         }
 
-        function simulationLoop(time) {
-            if (!isSimulating || !window.simData) return;
+        window.simulationLoop = (time) => {
+            if (!window.isSimulating || !window.simData) return;
             const canvas = document.getElementById('sim-canvas');
             if (!canvas) {
-                requestAnimationFrame(simulationLoop); // Keep trying if canvas is re-rendering
+                requestAnimationFrame(window.simulationLoop);
                 return;
             }
 
             const ctx = canvas.getContext('2d');
-            const t = (time - simStartTime) / 1000; // time in true seconds
+            const t = (time - window.simStartTime) / 1000; 
             
-            // Calculate current physical position
-            const currentX = evaluateX(t);
-            simHistory.push({ t, x: currentX });
-            
-            // Keep history length manageable for performance
-            if (simHistory.length > 600) simHistory.shift();
+            const currentX = window.evaluateX(t);
+            window.simHistory.push({ t, x: currentX });
+            if (window.simHistory.length > 600) window.simHistory.shift();
 
-            // Auto-scaling logic (prevents visualization from breaking if amplitude is massive or tiny)
             let maxAbsX = 0.0001; 
-            for (let pt of simHistory) {
+            for (let pt of window.simHistory) {
                 if (Math.abs(pt.x) > maxAbsX) maxAbsX = Math.abs(pt.x);
             }
             if (Math.abs(window.simData.x0) > maxAbsX) maxAbsX = Math.abs(window.simData.x0);
             if (window.simData.isForced && Math.abs(window.simData.X) * 1.5 > maxAbsX) maxAbsX = Math.abs(window.simData.X) * 1.5;
 
-            // Clear frame
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Dimensions Setup
             const graphLeft = 280;
             const graphWidth = canvas.width - graphLeft - 20;
             const graphCenterY = canvas.height / 2;
 
-            // --- 1. DRAW SCROLLING HISTORY GRAPH (RIGHT SIDE) ---
-            
-            // Draw Zero-Axis
+            // --- DRAW GRAPH ---
             ctx.strokeStyle = '#475569';
             ctx.lineWidth = 1;
             ctx.setLineDash([5, 5]);
@@ -753,34 +1091,32 @@
             ctx.moveTo(graphLeft, graphCenterY);
             ctx.lineTo(graphLeft + graphWidth, graphCenterY);
             ctx.stroke();
-            ctx.setLineDash([]); // reset
+            ctx.setLineDash([]);
 
-            // Draw purple sine trace
             ctx.strokeStyle = '#a855f7'; 
             ctx.lineWidth = 2.5;
             ctx.lineJoin = 'round';
             ctx.beginPath();
             
-            const timeWindow = 4; // Display exactly 4 seconds of scrolling history
-            for (let i = 0; i < simHistory.length; i++) {
-                const pt = simHistory[i];
+            const timeWindow = 4; 
+            for (let i = 0; i < window.simHistory.length; i++) {
+                const pt = window.simHistory[i];
                 const timeDiff = t - pt.t;
-                if (timeDiff > timeWindow) continue; // Out of frame
+                if (timeDiff > timeWindow) continue;
 
                 const px = graphLeft + graphWidth - (timeDiff / timeWindow) * graphWidth;
-                const py = graphCenterY - (pt.x / maxAbsX) * (graphCenterY - 45); // 45px padding
+                const py = graphCenterY - (pt.x / maxAbsX) * (graphCenterY - 45); 
 
                 if (i === 0) ctx.moveTo(px, py);
                 else ctx.lineTo(px, py);
             }
             ctx.stroke();
 
-            // --- 2. DRAW SELECTED PHYSICAL THEME (LEFT SIDE) ---
+            // --- DRAW PHYSICAL MODEL ---
             const centerX = 140;
             const massY = graphCenterY - (currentX / maxAbsX) * (graphCenterY - 45); 
 
             if (window.simTheme === 'classic') {
-                // Draw connecting dashed tracker line to the graph
                 ctx.strokeStyle = 'rgba(148, 163, 184, 0.4)';
                 ctx.lineWidth = 1;
                 ctx.setLineDash([5, 5]);
@@ -790,11 +1126,9 @@
                 ctx.stroke();
                 ctx.setLineDash([]);
 
-                // Draw Ceiling Mount
                 ctx.fillStyle = '#64748b';
                 ctx.fillRect(centerX - 60, 15, 120, 10);
                 
-                // Ceiling hatch marks
                 ctx.strokeStyle = '#94a3b8';
                 ctx.lineWidth = 1;
                 ctx.beginPath();
@@ -804,7 +1138,6 @@
                 }
                 ctx.stroke();
 
-                // SPRING (Left side of mass)
                 const springX = centerX - 25;
                 ctx.strokeStyle = '#3b82f6';
                 ctx.lineWidth = 3;
@@ -822,7 +1155,6 @@
                 ctx.lineTo(springX, massY - 20);
                 ctx.stroke();
 
-                // DAMPER (Right side - Only renders if zeta > 0)
                 if (window.simData.zeta > 0) {
                     const dampX = centerX + 25;
                     const dampTop = 25;
@@ -832,7 +1164,6 @@
                     ctx.strokeStyle = '#f59e0b';
                     ctx.lineWidth = 3;
                     
-                    // Inner Piston
                     ctx.beginPath();
                     ctx.moveTo(dampX, dampTop);
                     ctx.lineTo(dampX, dampTop + dampH * 0.45);
@@ -840,7 +1171,6 @@
                     ctx.lineTo(dampX + 12, dampTop + dampH * 0.45);
                     ctx.stroke();
 
-                    // Outer Cylinder
                     ctx.beginPath();
                     ctx.moveTo(dampX, dampBot);
                     ctx.lineTo(dampX, dampTop + dampH * 0.65);
@@ -852,7 +1182,6 @@
                     ctx.stroke();
                 }
 
-                // MASS BLOCK
                 ctx.fillStyle = '#1e293b';
                 ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
                 ctx.shadowBlur = 10;
@@ -865,7 +1194,6 @@
                 ctx.textAlign = 'center';
                 ctx.fillText('M', centerX, massY + 6);
 
-                // FORCED EXCITATION ARROW
                 if (window.simData.isForced) {
                     const forceVal = Math.sin(window.simData.w * t);
                     const arrowLen = forceVal * 25;
@@ -899,17 +1227,14 @@
                 }
 
             } else if (window.simTheme === 'building') {
-                // Map vertical graph displacement to horizontal structural sway
                 const sway = (currentX / maxAbsX) * 45;
                 const groundY = 190;
                 const roofY = 70;
                 const colSpacing = 35;
 
-                // Ground
                 ctx.fillStyle = '#64748b';
                 ctx.fillRect(centerX - 80, groundY, 160, 10);
                 
-                // Flexible Columns (Bending via Quadratic Curve)
                 ctx.strokeStyle = '#94a3b8';
                 ctx.lineWidth = 6;
                 ctx.beginPath();
@@ -919,7 +1244,6 @@
                 ctx.quadraticCurveTo(centerX + colSpacing, (groundY + roofY) / 2, centerX + colSpacing + sway, roofY);
                 ctx.stroke();
 
-                // Rigid Roof (Mass)
                 ctx.fillStyle = '#1e293b';
                 ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
                 ctx.shadowBlur = 10;
@@ -932,7 +1256,6 @@
                 ctx.textAlign = 'center';
                 ctx.fillText('Roof (M)', centerX + sway, roofY - 7);
 
-                // Indicator showing horizontal motion = graph wave
                 ctx.fillStyle = '#cbd5e1';
                 ctx.font = 'italic 11px Inter';
                 ctx.fillText(`Sway = x(t)`, centerX, 30);
@@ -940,23 +1263,20 @@
             } else if (window.simTheme === 'car') {
                 const roadY = 190;
                 const wheelY = roadY - 18;
-                const carY = massY - 25; // Offset car body upwards
+                const carY = massY - 25;
 
-                // Road
                 ctx.fillStyle = '#64748b';
                 ctx.fillRect(centerX - 80, roadY, 160, 10);
 
-                // Wheel
                 ctx.fillStyle = '#334155';
                 ctx.beginPath();
                 ctx.arc(centerX, wheelY, 18, 0, Math.PI * 2);
                 ctx.fill();
-                ctx.fillStyle = '#cbd5e1'; // Hubcap
+                ctx.fillStyle = '#cbd5e1';
                 ctx.beginPath();
                 ctx.arc(centerX, wheelY, 6, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Suspension Spring
                 ctx.strokeStyle = '#3b82f6';
                 ctx.lineWidth = 3;
                 ctx.lineJoin = 'round';
@@ -971,13 +1291,12 @@
                 ctx.lineTo(centerX, carY + 10);
                 ctx.stroke();
 
-                // Car Chassis
                 ctx.fillStyle = '#ef4444';
                 ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
                 ctx.shadowBlur = 10;
                 ctx.shadowOffsetY = 4;
-                ctx.fillRect(centerX - 60, carY, 120, 20); // Bottom chassis
-                ctx.fillRect(centerX - 30, carY - 20, 75, 20); // Cabin
+                ctx.fillRect(centerX - 60, carY, 120, 20); 
+                ctx.fillRect(centerX - 30, carY - 20, 75, 20); 
                 ctx.shadowColor = 'transparent';
 
                 ctx.fillStyle = '#ffffff';
@@ -985,7 +1304,6 @@
                 ctx.textAlign = 'center';
                 ctx.fillText('M', centerX, carY + 15);
 
-                // Tracker line to graph
                 ctx.strokeStyle = 'rgba(148, 163, 184, 0.4)';
                 ctx.lineWidth = 1;
                 ctx.setLineDash([5, 5]);
@@ -996,27 +1314,24 @@
                 ctx.setLineDash([]);
             }
 
-            // --- 3. DRAW DATA OVERLAYS ---
             ctx.fillStyle = '#f8fafc';
             ctx.font = '13px monospace';
-            ctx.textAlign = 'left'; // Reset alignment
+            ctx.textAlign = 'left'; 
             
-            // Live numeric tracking
-            ctx.fillStyle = '#60a5fa'; // Blue-400
+            ctx.fillStyle = '#60a5fa'; 
             ctx.fillText(`x(t) = ${currentX.toFixed(4)}m`, 20, canvas.height - 15);
             
-            // Graph Data labels
             ctx.fillStyle = '#94a3b8';
             ctx.fillText(`+${maxAbsX.toFixed(3)}`, graphLeft - 50, 40);
             ctx.fillText(`0.000`, graphLeft - 45, graphCenterY + 4);
             ctx.fillText(`-${maxAbsX.toFixed(3)}`, graphLeft - 50, canvas.height - 30);
             ctx.fillText(`Time (t): ${t.toFixed(1)}s`, graphLeft + graphWidth - 110, canvas.height - 15);
 
-            requestAnimationFrame(simulationLoop);
+            requestAnimationFrame(window.simulationLoop);
         }
 
-        // Initialize empty state
-        window.onload = () => { updateCalculations(); };
+        // Init calculations after UI binds
+        setTimeout(() => window.updateCalculations(), 100);
     </script>
 </body>
 </html>
