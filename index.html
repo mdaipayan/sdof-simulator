@@ -379,7 +379,7 @@
         
         let currentUser = null;
         let db = null;
-        const appId = 'sdof-github-app';
+        let appId = 'sdof-github-app';
 
         // Helper formatting function
         window.fmt = (num, decimals = 4) => Number.isFinite(num) ? Number(num.toFixed(decimals)) : '0';
@@ -387,24 +387,31 @@
         // --- FIREBASE INITIALIZATION ---
         const initFirebase = async () => {
             try {
-                // Your exact Firebase configuration for GitHub Pages
-                const firebaseConfig = {
-                    apiKey: "AIzaSyA__ax18T1IWp94YAAGnTdkFlZfYPBOriM",
-                    authDomain: "web-app-1212d.firebaseapp.com",
-                    projectId: "web-app-1212d",
-                    storageBucket: "web-app-1212d.firebasestorage.app",
-                    messagingSenderId: "318666262482",
-                    appId: "1:318666262482:web:92d6fc9ad5f16d662bea0b",
-                    measurementId: "G-WVJ7MMTGM7"
-                };
-
-                const app = initializeApp(firebaseConfig);
-                const auth = getAuth(app);
-                db = getFirestore(app);
-
-                // Canvas Sandbox Compatibility (Ignores this on GitHub)
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                let auth;
+                // 1. Check if we're in the Sandbox Environment
+                if (typeof __firebase_config !== 'undefined' && typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    const firebaseConfig = JSON.parse(__firebase_config);
+                    const app = initializeApp(firebaseConfig);
+                    auth = getAuth(app);
+                    db = getFirestore(app);
+                    appId = typeof __app_id !== 'undefined' ? __app_id : 'sdof-default-app';
                     await signInWithCustomToken(auth, __initial_auth_token);
+                } 
+                // 2. Otherwise, we are on GitHub Pages (Uses your personal Config)
+                else {
+                    const firebaseConfig = {
+                        apiKey: "AIzaSyA__ax18T1IWp94YAAGnTdkFlZfYPBOriM",
+                        authDomain: "web-app-1212d.firebaseapp.com",
+                        projectId: "web-app-1212d",
+                        storageBucket: "web-app-1212d.firebasestorage.app",
+                        messagingSenderId: "318666262482",
+                        appId: "1:318666262482:web:92d6fc9ad5f16d662bea0b",
+                        measurementId: "G-WVJ7MMTGM7"
+                    };
+                    const app = initializeApp(firebaseConfig);
+                    auth = getAuth(app);
+                    db = getFirestore(app);
+                    appId = 'sdof-github-app';
                 }
 
                 onAuthStateChanged(auth, async (user) => {
@@ -451,7 +458,6 @@
             }
         };
 
-        // --- STREAMING_CHUNK:Defining Google Authentication interactions... ---
         // Google Login Action
         window.loginWithGoogle = async () => {
             const provider = new GoogleAuthProvider();
@@ -501,7 +507,6 @@
         initFirebase();
 
 
-        // --- STREAMING_CHUNK:Setting up UI event handlers and navigation... ---
         // --- TAB NAVIGATION ---
         window.switchTab = (tabId) => {
             const tabs = ['solver', 'formulas', 'history'];
@@ -558,7 +563,6 @@
             window.simTheme = val; 
         };
 
-        // --- STREAMING_CHUNK:Providing quick-load examples... ---
         window.loadExample = (type) => {
             window.switchTab('solver'); 
             if (type === 'decay') {
@@ -587,7 +591,6 @@
             window.updateCalculations();
         }
 
-        // --- STREAMING_CHUNK:Implementing Database read/write logic... ---
         // --- CLOUD SAVE LOGIC ---
         window.saveCalculation = async () => {
             if (!currentUser) {
@@ -699,7 +702,6 @@
             window.updateCalculations();
         }
 
-        // --- STREAMING_CHUNK:Executing the core Math Engine (Trinity and Phase 2A/B)... ---
         // --- MATH CALCULATOR ---
         window.updateCalculations = () => {
             const m = parseFloat(document.getElementById('inp-m').value);
@@ -724,6 +726,16 @@
                 return;
             }
 
+            if (window.isForced && (isNaN(f0) || isNaN(w) || w <= 0)) {
+                window.isSimulating = false;
+                window.currentCalculationData = null;
+                badge.textContent = "Awaiting Force Data...";
+                badge.className = "text-sm px-3 py-1 bg-slate-100 text-slate-500 rounded-full font-medium";
+                outputDiv.innerHTML = `<div class="text-center text-slate-400 py-12"><p class="text-lg">Please enter valid Force Amplitude (\\(F_0\\)) and Frequency (\\(\\omega\\)).</p></div>`;
+                if (window.MathJax) MathJax.typesetPromise([outputDiv]).catch(console.error);
+                return;
+            }
+
             const wn = Math.sqrt(k / m);
             const cc = 2 * Math.sqrt(k * m);
             const zeta = c / cc;
@@ -737,6 +749,53 @@
             else if (zeta < 1) { dampingType = "Underdamped"; badgeColor = "bg-blue-100 text-blue-700"; }
             else if (Math.abs(zeta - 1) < 0.001) { dampingType = "Critically Damped"; badgeColor = "bg-purple-100 text-purple-700"; }
             else { dampingType = "Overdamped"; badgeColor = "bg-orange-100 text-orange-700"; }
+
+            // Pre-calculate frequencies for the general equations block
+            let decay = 0;
+            let extraVarsHtml = "";
+            if (zeta < 1 && zeta > 0) {
+                wd = wn * Math.sqrt(1 - Math.pow(zeta, 2));
+                decay = zeta * wn;
+                extraVarsHtml = `<p class="math-block mb-3 text-slate-700"><strong>Damped Freq:</strong> \\( \\omega_d = \\omega_n \\sqrt{1-\\zeta^2} = \\mathbf{${window.fmt(wd)} \\text{ rad/s}} \\)</p>`;
+            } else if (zeta > 1) {
+                const root = wn * Math.sqrt(Math.pow(zeta, 2) - 1);
+                s1 = -zeta*wn + root; s2 = -zeta*wn - root;
+                extraVarsHtml = `<p class="math-block mb-3 text-slate-700"><strong>Roots:</strong> \\( s_1 = \\mathbf{${window.fmt(s1)}} \\), \\( s_2 = \\mathbf{${window.fmt(s2)}} \\)</p>`;
+            }
+
+            // Construct Universal General Equations
+            let genDispStr = "";
+            let genVelStr = "";
+            
+            if (!window.isForced) {
+                if (zeta === 0) {
+                    genDispStr = `A \\cos(${window.fmt(wn)}t) + B \\sin(${window.fmt(wn)}t)`;
+                    genVelStr = `-${window.fmt(wn)}A \\sin(${window.fmt(wn)}t) + ${window.fmt(wn)}B \\cos(${window.fmt(wn)}t)`;
+                } else if (zeta < 1) {
+                    genDispStr = `e^{-${window.fmt(decay)}t} \\left( A \\cos(${window.fmt(wd)}t) + B \\sin(${window.fmt(wd)}t) \\right)`;
+                    genVelStr = `e^{-${window.fmt(decay)}t} \\left[ (-${window.fmt(decay)}A + ${window.fmt(wd)}B)\\cos(${window.fmt(wd)}t) - (${window.fmt(decay)}B + ${window.fmt(wd)}A)\\sin(${window.fmt(wd)}t) \\right]`;
+                } else if (Math.abs(zeta - 1) < 0.001) {
+                    genDispStr = `(A + Bt) e^{-${window.fmt(wn)}t}`;
+                    genVelStr = `[B - ${window.fmt(wn)}(A + Bt)] e^{-${window.fmt(wn)}t}`;
+                } else {
+                    genDispStr = `A e^{${window.fmt(s1)}t} + B e^{${window.fmt(s2)}t}`;
+                    genVelStr = `${window.fmt(s1)}A e^{${window.fmt(s1)}t} + ${window.fmt(s2)}B e^{${window.fmt(s2)}t}`;
+                }
+            } else {
+                if (zeta === 0) {
+                    genDispStr = `A\\cos(${window.fmt(wn)}t) + B\\sin(${window.fmt(wn)}t) + X\\sin(${window.fmt(w)}t - \\phi)`;
+                    genVelStr = `-${window.fmt(wn)}A\\sin(${window.fmt(wn)}t) + ${window.fmt(wn)}B\\cos(${window.fmt(wn)}t) + ${window.fmt(w)}X\\cos(${window.fmt(w)}t - \\phi)`;
+                } else if (zeta < 1) {
+                    genDispStr = `e^{-${window.fmt(decay)}t}(A\\cos(${window.fmt(wd)}t) + B\\sin(${window.fmt(wd)}t)) + X\\sin(${window.fmt(w)}t - \\phi)`;
+                    genVelStr = `e^{-${window.fmt(decay)}t}[(-${window.fmt(decay)}A + ${window.fmt(wd)}B)\\cos(${window.fmt(wd)}t) - (${window.fmt(decay)}B + ${window.fmt(wd)}A)\\sin(${window.fmt(wd)}t)] + ${window.fmt(w)}X\\cos(${window.fmt(w)}t - \\phi)`;
+                } else if (Math.abs(zeta - 1) < 0.001) {
+                    genDispStr = `(A + Bt)e^{-${window.fmt(wn)}t} + X\\sin(${window.fmt(w)}t - \\phi)`;
+                    genVelStr = `[B - ${window.fmt(wn)}(A + Bt)]e^{-${window.fmt(wn)}t} + ${window.fmt(w)}X\\cos(${window.fmt(w)}t - \\phi)`;
+                } else {
+                    genDispStr = `Ae^{${window.fmt(s1)}t} + Be^{${window.fmt(s2)}t} + X\\sin(${window.fmt(w)}t - \\phi)`;
+                    genVelStr = `${window.fmt(s1)}Ae^{${window.fmt(s1)}t} + ${window.fmt(s2)}Be^{${window.fmt(s2)}t} + ${window.fmt(w)}X\\cos(${window.fmt(w)}t - \\phi)`;
+                }
+            }
 
             badge.textContent = `${window.isForced ? 'Forced' : 'Free'} - ${dampingType}`;
             badge.className = `text-sm px-3 py-1 rounded-full font-bold shadow-sm border border-black/10 ${badgeColor}`;
@@ -795,29 +854,33 @@
                         <p class="math-block">\\( \\zeta = \\frac{C}{C_c} = \\frac{${window.fmt(c)}}{${window.fmt(cc)}} = \\mathbf{${window.fmt(zeta)}} \\)</p>
                     </div>
                 </details>
+            </div>
+            
+            <div class="mb-8">
+                <h3 class="text-xl font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4 text-slate-700">2. Governing Equations of Motion</h3>
+                ${extraVarsHtml}
+                <div class="bg-indigo-50 border-l-4 border-indigo-500 p-4 rounded-r-lg mb-4 space-y-3 shadow-sm">
+                    <div>
+                        <p class="text-xs font-bold text-indigo-600 uppercase tracking-wider mb-1">General Displacement Formula</p>
+                        <div class="math-block font-bold text-lg">\\( x(t) = ${genDispStr} \\)</div>
+                    </div>
+                    <div class="border-t border-indigo-200 pt-3">
+                        <p class="text-xs font-bold text-indigo-600 uppercase tracking-wider mb-1">General Velocity Formula (Derivative)</p>
+                        <div class="math-block font-bold text-lg">\\( v(t) = ${genVelStr} \\)</div>
+                    </div>
+                </div>
+                <p class="text-sm text-slate-600 italic">This is the general mathematical form for a <strong>${dampingType.toLowerCase()}</strong> ${window.isForced ? 'forced' : 'free'} vibration system. The remaining steps will solve for the unknown constants (A, B${window.isForced ? ', X, and \\(\\phi\\)' : ''}).</p>
             </div>`;
 
-            // --- STREAMING_CHUNK:Evaluating branches based on damping ratio and forces... ---
             let finalEquationStr = "";
 
             if (!window.isForced) {
                 // =============== FREE VIBRATION ===============
-                html += `<div class="mb-8"><h3 class="text-xl font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4">2. General Equations of Motion</h3>`;
+                html += `<div class="mb-8"><h3 class="text-xl font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4">3. Applying Initial Conditions</h3>`;
                 
                 if (zeta === 0) {
                     A = x0; B = v0 / wn;
                     html += `
-                    <div class="bg-emerald-50 border-l-4 border-emerald-500 p-4 rounded-r-lg mb-6 space-y-3 shadow-sm">
-                        <div>
-                            <p class="text-xs font-bold text-emerald-600 uppercase tracking-wider mb-1">Displacement Formula</p>
-                            <div class="math-block font-bold">\\( x(t) = A \\cos(${window.fmt(wn)} t) + B \\sin(${window.fmt(wn)} t) \\)</div>
-                        </div>
-                        <div class="border-t border-emerald-200 pt-3">
-                            <p class="text-xs font-bold text-emerald-600 uppercase tracking-wider mb-1">Velocity Formula (Derivative)</p>
-                            <div class="math-block font-bold">\\( v(t) = -${window.fmt(wn)}A \\sin(${window.fmt(wn)} t) + ${window.fmt(wn)}B \\cos(${window.fmt(wn)} t) \\)</div>
-                        </div>
-                    </div>
-                    <h3 class="text-xl font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4">3. Applying Initial Conditions</h3>
                     <p class="math-block">\\( A = x_0 = \\mathbf{${window.fmt(A)}} \\)</p>
                     <p class="math-block mb-4">\\( B = \\frac{v_0}{\\omega_n} = \\mathbf{${window.fmt(B)}} \\)</p>
                     
@@ -829,8 +892,8 @@
                             <div class="mb-3 p-3 bg-blue-50 border-l-4 border-blue-400 text-blue-800 rounded text-xs leading-relaxed">
                                 <strong>💡 For Beginners: Why do we do this?</strong><br>
                                 We have a generic equation, but we need to find the specific constants (A and B) for our exact starting conditions.<br>
-                                1. We plug in <strong>t = 0</strong> into the displacement equation to match our starting position (\(x_0\)).<br>
-                                2. To use our starting velocity (\(v_0\)), we must use calculus to find the <strong>derivative</strong> (the velocity equation), and then plug in <strong>t = 0</strong>.
+                                1. We plug in <strong>t = 0</strong> into the displacement equation to match our starting position (\\(x_0\\)).<br>
+                                2. To use our starting velocity (\\(v_0\\)), we must use calculus to find the <strong>derivative</strong> (the velocity equation), and then plug in <strong>t = 0</strong>.
                             </div>
                             <p class="text-slate-600 italic">Displacement equation at t=0:</p>
                             <p class="math-block">\\( A = x_0 = \\mathbf{${window.fmt(A)}} \\)</p>
@@ -838,25 +901,12 @@
                             <p class="math-block">\\( B\\omega_n = v_0 \\implies B = \\frac{${window.fmt(v0)}}{${window.fmt(wn)}} = \\mathbf{${window.fmt(B)}} \\)</p>
                         </div>
                     </details>`;
-                    finalEquationStr = `x(t) = ${window.fmt(A)} \\cos(${window.fmt(wn)} t) + ${window.fmt(B)} \\sin(${window.fmt(wn)} t)`;
+                    finalEquationStr = `${window.fmt(A)} \\cos(${window.fmt(wn)} t) + ${window.fmt(B)} \\sin(${window.fmt(wn)} t)`;
 
                 } else if (zeta < 1) {
-                    wd = wn * Math.sqrt(1 - Math.pow(zeta, 2));
-                    const decay = zeta * wn;
                     A = x0; B = (v0 + decay * x0) / wd;
                     
-                    html += `<p class="math-block mb-2 text-blue-700">\\( \\omega_d = \\omega_n \\sqrt{1-\\zeta^2} = \\mathbf{${window.fmt(wd)} \\text{ rad/s}} \\)</p>
-                    <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg mb-6 space-y-3 shadow-sm">
-                        <div>
-                            <p class="text-xs font-bold text-blue-600 uppercase tracking-wider mb-1">Displacement Formula</p>
-                            <div class="math-block font-bold">\\( x(t) = e^{-${window.fmt(decay)} t} \\left( A \\cos(${window.fmt(wd)} t) + B \\sin(${window.fmt(wd)} t) \\right) \\)</div>
-                        </div>
-                        <div class="border-t border-blue-200 pt-3">
-                            <p class="text-xs font-bold text-blue-600 uppercase tracking-wider mb-1">Velocity Formula (Derivative)</p>
-                            <div class="math-block font-bold">\\( v(t) = e^{-${window.fmt(decay)} t} \\left[ (-${window.fmt(decay)}A + ${window.fmt(wd)}B)\\cos(${window.fmt(wd)}t) - (${window.fmt(decay)}B + ${window.fmt(wd)}A)\\sin(${window.fmt(wd)}t) \\right] \\)</div>
-                        </div>
-                    </div>
-                    <h3 class="text-xl font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4">3. Applying Initial Conditions</h3>
+                    html += `
                     <p class="math-block">\\( A = x_0 = \\mathbf{${window.fmt(A)}} \\)</p>
                     <p class="math-block mb-4">\\( B = \\frac{v_0 + \\zeta\\omega_n A}{\\omega_d} = \\mathbf{${window.fmt(B)}} \\)</p>
                     
@@ -868,8 +918,8 @@
                             <div class="mb-3 p-3 bg-blue-50 border-l-4 border-blue-400 text-blue-800 rounded text-xs leading-relaxed">
                                 <strong>💡 For Beginners: Why do we do this?</strong><br>
                                 We have a generic equation, but we need to find the specific constants (A and B) for our exact starting conditions.<br>
-                                1. We plug in <strong>t = 0</strong> into the displacement equation to match our starting position (\(x_0\)).<br>
-                                2. To use our starting velocity (\(v_0\)), we must use calculus to find the <strong>derivative</strong> (the velocity equation), and then plug in <strong>t = 0</strong>.
+                                1. We plug in <strong>t = 0</strong> into the displacement equation to match our starting position (\\(x_0\\)).<br>
+                                2. To use our starting velocity (\\(v_0\\)), we must use calculus to find the <strong>derivative</strong> (the velocity equation), and then plug in <strong>t = 0</strong>.
                             </div>
                             <p class="text-slate-600 italic">Finding the Damped Natural Frequency:</p>
                             <p class="math-block">\\( \\omega_d = ${window.fmt(wn)}\\sqrt{1-(${window.fmt(zeta)})^2} = \\mathbf{${window.fmt(wd)}} \\)</p>
@@ -877,22 +927,12 @@
                             <p class="math-block">\\( B = \\frac{${window.fmt(v0)} + (${window.fmt(zeta)})(${window.fmt(wn)})(${window.fmt(A)})}{${window.fmt(wd)}} = \\frac{${window.fmt(v0)} + ${window.fmt(decay * A)}}{${window.fmt(wd)}} = \\mathbf{${window.fmt(B)}} \\)</p>
                         </div>
                     </details>`;
-                    finalEquationStr = `x(t) = e^{-${window.fmt(decay)} t} \\left( ${window.fmt(A)} \\cos(${window.fmt(wd)} t) + ${window.fmt(B)} \\sin(${window.fmt(wd)} t) \\right)`;
+                    finalEquationStr = `e^{-${window.fmt(decay)} t} \\left( ${window.fmt(A)} \\cos(${window.fmt(wd)} t) + ${window.fmt(B)} \\sin(${window.fmt(wd)} t) \\right)`;
 
                 } else if (Math.abs(zeta - 1) < 0.001) {
                     A = x0; B = v0 + wn * x0;
+                    
                     html += `
-                    <div class="bg-purple-50 border-l-4 border-purple-500 p-4 rounded-r-lg mb-6 space-y-3 shadow-sm">
-                        <div>
-                            <p class="text-xs font-bold text-purple-600 uppercase tracking-wider mb-1">Displacement Formula</p>
-                            <div class="math-block font-bold">\\( x(t) = (A + Bt) e^{-${window.fmt(wn)} t} \\)</div>
-                        </div>
-                        <div class="border-t border-purple-200 pt-3">
-                            <p class="text-xs font-bold text-purple-600 uppercase tracking-wider mb-1">Velocity Formula (Derivative)</p>
-                            <div class="math-block font-bold">\\( v(t) = [B - ${window.fmt(wn)}(A + Bt)] e^{-${window.fmt(wn)} t} \\)</div>
-                        </div>
-                    </div>
-                    <h3 class="text-xl font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4">3. Applying Initial Conditions</h3>
                     <p class="math-block">\\( A = x_0 = \\mathbf{${window.fmt(A)}} \\)</p>
                     <p class="math-block mb-4">\\( B = v_0 + \\omega_n A = \\mathbf{${window.fmt(B)}} \\)</p>
                     
@@ -904,31 +944,19 @@
                             <div class="mb-3 p-3 bg-blue-50 border-l-4 border-blue-400 text-blue-800 rounded text-xs leading-relaxed">
                                 <strong>💡 For Beginners: Why do we do this?</strong><br>
                                 We have a generic equation, but we need to find the specific constants (A and B) for our exact starting conditions.<br>
-                                1. We plug in <strong>t = 0</strong> into the displacement equation to match our starting position (\(x_0\)).<br>
-                                2. To use our starting velocity (\(v_0\)), we must use calculus to find the <strong>derivative</strong> (the velocity equation), and then plug in <strong>t = 0</strong>.
+                                1. We plug in <strong>t = 0</strong> into the displacement equation to match our starting position (\\(x_0\\)).<br>
+                                2. To use our starting velocity (\\(v_0\\)), we must use calculus to find the <strong>derivative</strong> (the velocity equation), and then plug in <strong>t = 0</strong>.
                             </div>
                             <p class="text-slate-600 italic">Derivative for Velocity: \\( v(0) = B - \\omega_n A = v_0 \\)</p>
                             <p class="math-block">\\( B = ${window.fmt(v0)} + (${window.fmt(wn)})(${window.fmt(A)}) = \\mathbf{${window.fmt(B)}} \\)</p>
                         </div>
                     </details>`;
-                    finalEquationStr = `x(t) = (${window.fmt(A)} + ${window.fmt(B)}t) e^{-${window.fmt(wn)} t}`;
+                    finalEquationStr = `(${window.fmt(A)} + ${window.fmt(B)}t) e^{-${window.fmt(wn)} t}`;
 
                 } else {
-                    const root = wn * Math.sqrt(Math.pow(zeta, 2) - 1);
-                    s1 = -zeta*wn + root; s2 = -zeta*wn - root;
                     A = (v0 - s2*x0)/(s1 - s2); B = (s1*x0 - v0)/(s1 - s2);
+                    
                     html += `
-                    <div class="bg-orange-50 border-l-4 border-orange-500 p-4 rounded-r-lg mb-6 space-y-3 shadow-sm">
-                        <div>
-                            <p class="text-xs font-bold text-orange-600 uppercase tracking-wider mb-1">Displacement Formula</p>
-                            <div class="math-block font-bold">\\( x(t) = A e^{${window.fmt(s1)} t} + B e^{${window.fmt(s2)} t} \\)</div>
-                        </div>
-                        <div class="border-t border-orange-200 pt-3">
-                            <p class="text-xs font-bold text-orange-600 uppercase tracking-wider mb-1">Velocity Formula (Derivative)</p>
-                            <div class="math-block font-bold">\\( v(t) = ${window.fmt(s1)}A e^{${window.fmt(s1)} t} + ${window.fmt(s2)}B e^{${window.fmt(s2)} t} \\)</div>
-                        </div>
-                    </div>
-                    <h3 class="text-xl font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4">3. Applying Initial Conditions</h3>
                     <p class="math-block">\\( A = \\mathbf{${window.fmt(A)}} \\)</p>
                     <p class="math-block mb-4">\\( B = \\mathbf{${window.fmt(B)}} \\)</p>
                     
@@ -940,29 +968,19 @@
                             <div class="mb-3 p-3 bg-blue-50 border-l-4 border-blue-400 text-blue-800 rounded text-xs leading-relaxed">
                                 <strong>💡 For Beginners: Why do we do this?</strong><br>
                                 We have a generic equation, but we need to find the specific constants (A and B) for our exact starting conditions.<br>
-                                1. We plug in <strong>t = 0</strong> into the displacement equation to match our starting position (\(x_0\)).<br>
-                                2. To use our starting velocity (\(v_0\)), we must use calculus to find the <strong>derivative</strong> (the velocity equation), and then plug in <strong>t = 0</strong>.
+                                1. We plug in <strong>t = 0</strong> into the displacement equation to match our starting position (\\(x_0\\)).<br>
+                                2. To use our starting velocity (\\(v_0\\)), we must use calculus to find the <strong>derivative</strong> (the velocity equation), and then plug in <strong>t = 0</strong>.
                             </div>
                             <p class="math-block">\\( A = \\frac{v_0 - s_2 x_0}{s_1 - s_2} = \\frac{${window.fmt(v0)} - (${window.fmt(s2)})(${window.fmt(x0)})}{${window.fmt(s1)} - (${window.fmt(s2)})} = \\mathbf{${window.fmt(A)}} \\)</p>
                             <p class="math-block">\\( B = \\frac{s_1 x_0 - v_0}{s_1 - s_2} = \\frac{(${window.fmt(s1)})(${window.fmt(x0)}) - ${window.fmt(v0)}}{${window.fmt(s1)} - (${window.fmt(s2)})} = \\mathbf{${window.fmt(B)}} \\)</p>
                         </div>
                     </details>`;
-                    finalEquationStr = `x(t) = ${window.fmt(A)} e^{${window.fmt(s1)} t} + ${window.fmt(B)} e^{${window.fmt(s2)} t}`;
+                    finalEquationStr = `${window.fmt(A)} e^{${window.fmt(s1)} t} + ${window.fmt(B)} e^{${window.fmt(s2)} t}`;
                 }
                 html += `</div>`;
 
-            // --- STREAMING_CHUNK:Calculating and assembling forced vibrations output... ---
             } else {
                 // =============== FORCED VIBRATION ===============
-                if (isNaN(f0) || isNaN(w) || w <= 0) {
-                    window.isSimulating = false;
-                    window.currentCalculationData = null;
-                    html += `<div class="text-center text-slate-400 py-12"><p class="text-lg">Enter Force details to continue...</p></div>`;
-                    outputDiv.innerHTML = html; 
-                    if (window.MathJax) MathJax.typesetPromise([outputDiv]).catch(console.error);
-                    return;
-                }
-
                 const r = w / wn; const denom1 = 1 - Math.pow(r, 2); const denom2 = 2 * zeta * r;
                 const X0 = f0 / k; const mag = 1 / Math.sqrt(Math.pow(denom1, 2) + Math.pow(denom2, 2));
                 X = X0 * mag;
@@ -971,7 +989,7 @@
                 if(rawPhi < 0) rawPhi += Math.PI; 
                 
                 html += `<div class="mb-8">
-                    <h3 class="text-xl font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4">2. Steady State Properties</h3>
+                    <h3 class="text-xl font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4">3. Steady State Properties</h3>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                         <div class="bg-white p-3 rounded shadow-sm border border-slate-100 text-center"><p class="text-xs text-slate-500 font-bold mb-1">Freq Ratio (r)</p><p class="font-mono">${window.fmt(r)}</p></div>
                         <div class="bg-white p-3 rounded shadow-sm border border-slate-100 text-center"><p class="text-xs text-slate-500 font-bold mb-1">Static Disp (X₀)</p><p class="font-mono">${window.fmt(X0)} m</p></div>
@@ -1003,47 +1021,15 @@
                 </div>`;
 
                 // Combine Transient and Apply ICs
-                html += `<div class="mb-8"><h3 class="text-xl font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4">3. Complete Solution & Constants</h3>`;
+                html += `<div class="mb-8"><h3 class="text-xl font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4">4. Transient Constants</h3>`;
                 
                 const x_steady_0 = X * Math.sin(-rawPhi);
                 const v_steady_0 = w * X * Math.cos(-rawPhi);
                 const C0 = x0 - x_steady_0; 
                 const C1 = v0 - v_steady_0; 
 
-                // --- Generate explicit equations for Forced Vibration ---
-                let genDispStr = "";
-                let genVelStr = "";
-                if (zeta === 0) {
-                    genDispStr = `A\\cos(${window.fmt(wn)}t) + B\\sin(${window.fmt(wn)}t) + ${window.fmt(X)}\\sin(${window.fmt(w)}t - ${window.fmt(rawPhi)})`;
-                    genVelStr = `-${window.fmt(wn)}A\\sin(${window.fmt(wn)}t) + ${window.fmt(wn)}B\\cos(${window.fmt(wn)}t) + ${window.fmt(X * w)}\\cos(${window.fmt(w)}t - ${window.fmt(rawPhi)})`;
-                } else if (zeta < 1) {
-                    let dcy = zeta * wn;
-                    wd = wn * Math.sqrt(1 - Math.pow(zeta, 2));
-                    genDispStr = `e^{-${window.fmt(dcy)}t}(A\\cos(${window.fmt(wd)}t) + B\\sin(${window.fmt(wd)}t)) + ${window.fmt(X)}\\sin(${window.fmt(w)}t - ${window.fmt(rawPhi)})`;
-                    genVelStr = `e^{-${window.fmt(dcy)}t}[(-${window.fmt(dcy)}A + ${window.fmt(wd)}B)\\cos(${window.fmt(wd)}t) - (${window.fmt(dcy)}B + ${window.fmt(wd)}A)\\sin(${window.fmt(wd)}t)] + ${window.fmt(X * w)}\\cos(${window.fmt(w)}t - ${window.fmt(rawPhi)})`;
-                } else if (Math.abs(zeta - 1) < 0.001) {
-                    genDispStr = `(A + Bt)e^{-${window.fmt(wn)}t} + ${window.fmt(X)}\\sin(${window.fmt(w)}t - ${window.fmt(rawPhi)})`;
-                    genVelStr = `[B - ${window.fmt(wn)}(A + Bt)]e^{-${window.fmt(wn)}t} + ${window.fmt(X * w)}\\cos(${window.fmt(w)}t - ${window.fmt(rawPhi)})`;
-                } else {
-                    const root = wn * Math.sqrt(Math.pow(zeta, 2) - 1);
-                    s1 = -zeta*wn + root; s2 = -zeta*wn - root;
-                    genDispStr = `Ae^{${window.fmt(s1)}t} + Be^{${window.fmt(s2)}t} + ${window.fmt(X)}\\sin(${window.fmt(w)}t - ${window.fmt(rawPhi)})`;
-                    genVelStr = `${window.fmt(s1)}Ae^{${window.fmt(s1)}t} + ${window.fmt(s2)}Be^{${window.fmt(s2)}t} + ${window.fmt(X * w)}\\cos(${window.fmt(w)}t - ${window.fmt(rawPhi)})`;
-                }
-
                 html += `
-                <div class="bg-indigo-50 border-l-4 border-indigo-500 p-4 rounded-r-lg mb-6 space-y-3 shadow-sm">
-                    <div>
-                        <p class="text-xs font-bold text-indigo-600 uppercase tracking-wider mb-1">Complete Displacement Equation</p>
-                        <div class="math-block font-bold">\\( x(t) = ${genDispStr} \\)</div>
-                    </div>
-                    <div class="border-t border-indigo-200 pt-3">
-                        <p class="text-xs font-bold text-indigo-600 uppercase tracking-wider mb-1">Complete Velocity Equation (Derivative)</p>
-                        <div class="math-block font-bold">\\( v(t) = ${genVelStr} \\)</div>
-                    </div>
-                </div>
-                
-                <p class="mb-4 text-sm text-slate-700">We must apply the initial conditions to the <strong>Complete Equation</strong>.<br>
+                <p class="mb-4 text-sm text-slate-700">We must apply the initial conditions to the <strong>Complete Equation</strong> generated in Step 2.<br>
                 \\( x_{trans}(0) = x_0 - x_{ss}(0) = \\mathbf{${window.fmt(C0)}} \\)<br>
                 \\( v_{trans}(0) = v_0 - v_{ss}(0) = \\mathbf{${window.fmt(C1)}} \\)</p>`;
 
@@ -1056,8 +1042,6 @@
                         <p class="math-block">\\( B = \\frac{v_{trans}(0)}{\\omega_n} = \\frac{${window.fmt(C1)}}{${window.fmt(wn)}} = \\mathbf{${window.fmt(B)}} \\)</p>
                     `;
                 } else if (zeta < 1) {
-                    wd = wn * Math.sqrt(1 - Math.pow(zeta, 2));
-                    const decay = zeta * wn;
                     A = C0; B = (C1 + decay * A) / wd;
                     finalEquationStr = `e^{-${window.fmt(decay)}t}\\left(${window.fmt(A)}\\cos(${window.fmt(wd)}t) + ${window.fmt(B)}\\sin(${window.fmt(wd)}t)\\right) + ${window.fmt(X)}\\sin(${window.fmt(w)}t - ${window.fmt(rawPhi)})`;
                     transientStepHTML = `
@@ -1072,8 +1056,6 @@
                         <p class="math-block">\\( B = v_{trans}(0) + \\omega_n A = ${window.fmt(C1)} + (${window.fmt(wn)})(${window.fmt(A)}) = \\mathbf{${window.fmt(B)}} \\)</p>
                     `;
                 } else {
-                    const root = wn * Math.sqrt(Math.pow(zeta, 2) - 1);
-                    s1 = -zeta*wn + root; s2 = -zeta*wn - root;
                     A = (C1 - s2*C0)/(s1 - s2); B = (s1*C0 - C1)/(s1 - s2);
                     finalEquationStr = `${window.fmt(A)}e^{${window.fmt(s1)}t} + ${window.fmt(B)}e^{${window.fmt(s2)}t} + ${window.fmt(X)}\\sin(${window.fmt(w)}t - ${window.fmt(rawPhi)})`;
                     transientStepHTML = `
@@ -1110,7 +1092,6 @@
                 </div>`;
             }
 
-            // --- STREAMING_CHUNK:Finalizing UI layout and connecting simulation loop... ---
             // SECTION: FINAL EQUATION & SAVE BUTTON
             html += `
             <div class="bg-gray-900 rounded-xl p-6 shadow-xl border border-gray-700 text-white">
